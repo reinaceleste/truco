@@ -3,8 +3,8 @@
 *  \file prototipos.h
 *  \brief Contiene los prototipos de las funciones, las constantes simbólicas, typedefs y estructuras utilizadas en el TP
 * \author Federico Ariel Marinzalda
-* \version 1.0
-* \date 24/9/2016
+* \version 1.1
+* \date 1/12/2016
 *
 *
 *******************************************************/
@@ -43,6 +43,7 @@ int myStrlen (const char*);
 #define ENVIDO (JUGARCARTA+1)
 #define REALENVIDO (JUGARCARTA+2)
 #define FALTAENVIDO (JUGARCARTA+3)
+#define ENVIDOENVIDO (FALTAENVIDO+1)
 #define FLOR (JUGARCARTA+4)
 #define CONTRAFLOR (JUGARCARTA+5)
 #define CONTRAFLORALRESTO (JUGARCARTA+6)

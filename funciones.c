@@ -3,8 +3,8 @@
 *  \file funciones.c
 *  \brief Contiene las funciones utilizadas en el TP
 * \author Federico Ariel Marinzalda
-* \version 1.0
-* \date 24/9/2016
+* \version 1.1
+* \date 1/12/2016
 *
 *
 *******************************************************/
@@ -216,8 +216,8 @@ void repartircartas (baraja_t(*cartas)[10],baraja_t(*cartasrepartidas)[3],unsign
 *  \fn void calculotanto (baraja_t(*cartas)[10],baraja_t(*cartasrepartidas)[3],unsigned char(*valorcartaparaprimera)[10],char* tantoenvido,char* tantoflor,unsigned char jugadoresporequipo,unsigned char hayflor)
 *  \brief Función que calcula los tantos que tiene cada jugador para el envido o la flor
 * \author Federico Ariel Marinzalda
-* \version 1.0
-* \date 24/9/2016
+* \version 1.1
+* \date 1/12/2016
 * \param [in] **cartas Puntero a puntero a baraja_t que contiene la dirección de comienzo de la matriz de cartas
 * \param [in] **cartasrepartidas Puntero a puntero a baraja_t que contiene la dirección de comienzo de la matriz con los códigos de las cartas repartidas para los jugadores
 * \param [in] **valorcaraparaprimera Puntero a puntero a unsigned int que contiene la dirección de comienzo de la matriz con el valor de cada carta para el envido o la flor
@@ -251,7 +251,7 @@ void calculotanto (baraja_t(*cartas)[10],baraja_t(*cartasrepartidas)[3],unsigned
                 }
             }
         }
-        else if((cartasrepartidas[i-JUG1][0]/FACTOR)==(cartasrepartidas[i-JUG1][1]/FACTOR) && (cartasrepartidas[i-JUG1][2]/FACTOR)==(cartasrepartidas[i-JUG1][1]/FACTOR))
+        if((cartasrepartidas[i-JUG1][0]/FACTOR)==(cartasrepartidas[i-JUG1][1]/FACTOR) && (cartasrepartidas[i-JUG1][2]/FACTOR)==(cartasrepartidas[i-JUG1][1]/FACTOR))
         {
             tantoenvido[i-JUG1]=20;
             min=8;

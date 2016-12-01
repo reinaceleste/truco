@@ -10,8 +10,8 @@
 * - Borrar web con make no_html
 * - Agregar archivos .c, Makefile y Doxyfile al repositorio con make svn
 * \author Federico Ariel Marinzalda
-* \version 1.0
-* \date 24/9/2016
+* \version 1.1
+* \date 1/12/2016
 *
 *
 *******************************************************/
@@ -23,9 +23,9 @@ int main (int argc,char **argv)
 {
     unsigned char i,j,k,jugadoresporequipo,carta,cont;
     unsigned char mano=JUG1,tomacarta,maxeq1,maxeq2;
-    unsigned char r,s,aux,aux2,flag,min,n;
-    char max;
-    int opcion,opcvalida,naipe;
+    unsigned char r,s,aux,aux2,flag,min,n,malcanto=NO,jugganaprimera;
+    char max,maxtanto=-1;
+    int opcion,opcvalida,naipe,tanto;
     unsigned char hayflor,haypicapica=NO,estilo=REDONDA;
     unsigned char mostrarcartas,palo,valida;
     unsigned char acciones[18][6]={{SI,SI,SI,SI,SI,SI},
@@ -47,7 +47,7 @@ int main (int argc,char **argv)
                                     {SI,SI,SI,SI,SI,SI},
                                     {NO,NO,NO,NO,NO,NO}};
     unsigned char puntosprimera,puntossegunda,cant;
-    unsigned char eqganaprimera,eqganasegunda,cantotruco;
+    unsigned char eqganaprimera=NADIE,eqganasegunda=NADIE,cantotruco=NO,cantoenvido=NO,cantoflor=NO;
     unsigned char floresnegadaseq1=0,floresnegadaseq2=0;
     unsigned char puntoseq1=0,puntoseq2=0,enmazo,enmazoeq1,enmazoeq2,juega;
     unsigned char sejuegaprimera,sejuegasegunda,ultimoenjugarcarta;
@@ -58,7 +58,7 @@ int main (int argc,char **argv)
     unsigned char baza[3]={PARDA,PARDA,PARDA},bazaseq1,bazaseq2,mazo[6],bazasjugadas;
     unsigned char ordencartasjugadas[6][3]={0},bazaterminada;
     char cartasjugadastruco[6]={-2,-2,-2,-2,-2,-2};
-    if(argc<2)
+    if(argc<3)
     {
         printf("Error al iniciar el juego. Cerrando ...\n");
         return -1;
@@ -320,10 +320,154 @@ int main (int argc,char **argv)
                 juega%=2*jugadoresporequipo;
                 break;
             case ENVIDO:
+                printf("%d canta envido\n",juega+1);
+                if(sejuegaprimera=NO)
+                {
+                    cantoenvido=ENVIDO;
+                    sejuegaprimera=SI;
+                    puntosprimera=1;
+                    for(i=JUG1;i<JUG1+2*jugadoresporequipo;i++)
+                    {
+                        if(juega%2!=i%2)
+                        {
+                            acciones[QUIERO-JUGARCARTA][i-JUG1]=NO;
+                            acciones[NOQUIERO-JUGARCARTA][i-JUG1]=NO;
+                            acciones[ENVIDO-JUGARCARTA][i-JUG1]=NO;
+                            acciones[REALENVIDO-JUGARCARTA][i-JUG1]=NO;
+                            acciones[FALTAENVIDO-JUGARCARTA][i-JUG1]=NO;
+                        }
+                        else
+                        {
+                            acciones[QUIERO-JUGARCARTA][i-JUG1]=SI;
+                            acciones[NOQUIERO-JUGARCARTA][i-JUG1]=SI;
+                            acciones[ENVIDO-JUGARCARTA][i-JUG1]=SI;
+                            acciones[REALENVIDO-JUGARCARTA][i-JUG1]=SI;
+                            acciones[FALTAENVIDO-JUGARCARTA][i-JUG1]=SI;
+                        }
+                    }
+                }
+                else
+                {
+                    cantoenvido=ENVIDOENVIDO;
+                    puntosprimera=2;
+                    for(i=JUG1;i<JUG1+2*jugadoresporequipo;i++)
+                    {
+                        if(juega%2!=i%2)
+                        {
+                            acciones[QUIERO-JUGARCARTA][i-JUG1]=NO;
+                            acciones[NOQUIERO-JUGARCARTA][i-JUG1]=NO;
+                            acciones[ENVIDO-JUGARCARTA][i-JUG1]=NO;
+                            acciones[REALENVIDO-JUGARCARTA][i-JUG1]=NO;
+                            acciones[FALTAENVIDO-JUGARCARTA][i-JUG1]=NO;
+                        }
+                        else
+                        {
+                            acciones[QUIERO-JUGARCARTA][i-JUG1]=SI;
+                            acciones[NOQUIERO-JUGARCARTA][i-JUG1]=SI;
+                            acciones[ENVIDO-JUGARCARTA][i-JUG1]=NO;
+                            acciones[REALENVIDO-JUGARCARTA][i-JUG1]=SI;
+                            acciones[FALTAENVIDO-JUGARCARTA][i-JUG1]=NO;
+                        }
+                    }
+                }
+                if(cantotruco!=NO)
+                {
+                    juega++;
+                    juega%=2*jugadoresporequipo;
+                }
                 break;
             case REALENVIDO:
+                printf("%d canta real envido\n",juega+1);
+                for(i=JUG1;i<JUG1+2*jugadoresporequipo;i++)
+                {
+                    if(juega%2!=i%2)
+                    {
+                        acciones[QUIERO-JUGARCARTA][i-JUG1]=NO;
+                        acciones[NOQUIERO-JUGARCARTA][i-JUG1]=NO;
+                        acciones[ENVIDO-JUGARCARTA][i-JUG1]=NO;
+                        acciones[REALENVIDO-JUGARCARTA][i-JUG1]=NO;
+                        acciones[FALTAENVIDO-JUGARCARTA][i-JUG1]=NO;
+                    }
+                    else
+                    {
+                        acciones[QUIERO-JUGARCARTA][i-JUG1]=SI;
+                        acciones[NOQUIERO-JUGARCARTA][i-JUG1]=SI;
+                        acciones[ENVIDO-JUGARCARTA][i-JUG1]=NO;
+                        acciones[REALENVIDO-JUGARCARTA][i-JUG1]=NO;
+                        acciones[FALTAENVIDO-JUGARCARTA][i-JUG1]=SI;
+                    }
+                }
+                if(cantoenvido==ENVIDO)
+                {
+                    puntosprimera=2;
+                }
+                else if(cantoenvido==ENVIDOENVIDO)
+                {
+                    puntosprimera=4;
+                }
+                else if(cantoenvido=NO)
+                {
+                    sejuegaprimera=SI;
+                    puntosprimera=1;
+                }
+                cantoenvido=REALENVIDO;
+                if(cantotruco!=NO)
+                {
+                    juega++;
+                    juega%=2*jugadoresporequipo;
+                }
                 break;
             case FALTAENVIDO:
+                printf("%d canta falta envido\n",juega+1);
+                for(i=JUG1;i<JUG1+2*jugadoresporequipo;i++)
+                {
+                    if(juega%2!=i%2)
+                    {
+                        acciones[QUIERO-JUGARCARTA][i-JUG1]=NO;
+                        acciones[NOQUIERO-JUGARCARTA][i-JUG1]=NO;
+                        acciones[ENVIDO-JUGARCARTA][i-JUG1]=NO;
+                        acciones[REALENVIDO-JUGARCARTA][i-JUG1]=NO;
+                        acciones[FALTAENVIDO-JUGARCARTA][i-JUG1]=NO;
+                    }
+                    else
+                    {
+                        acciones[QUIERO-JUGARCARTA][i-JUG1]=SI;
+                        acciones[NOQUIERO-JUGARCARTA][i-JUG1]=SI;
+                        acciones[ENVIDO-JUGARCARTA][i-JUG1]=NO;
+                        acciones[REALENVIDO-JUGARCARTA][i-JUG1]=NO;
+                        acciones[FALTAENVIDO-JUGARCARTA][i-JUG1]=NO;
+                    }
+                }
+                if(cantoenvido==ENVIDO)
+                {
+                    puntosprimera=2;
+                }
+                else if(cantoenvido==REALENVIDO)
+                {
+                    if(puntosprimera==1)
+                    {
+                        puntosprimera=3;
+                    }
+                    if(puntosprimera==2)
+                    {
+                        puntosprimera=5;
+                    }
+                    if(puntosprimera==4)
+                    {
+                        puntosprimera=7;
+                    }
+                }
+                else if(cantoenvido=NO)
+                {
+                    sejuegaprimera=SI;
+                    puntosprimera=1;
+                }
+                cantoenvido=FALTAENVIDO;
+                if(cantotruco!=NO)
+                {
+                    juega++;
+                    juega%=2*jugadoresporequipo;
+                }
                 break;
             case FLOR:
                 break;
@@ -360,35 +504,63 @@ int main (int argc,char **argv)
                 break;
             case QUIERO:
                 printf("%d canta quiero\n",juega+1);
-                if(cantotruco==TRUCO)//Esto puede ir en una función
+                if(cantoenvido!=NO)
                 {
-                for(i=JUG1;i<JUG1+2*jugadoresporequipo;i++)
-                {
-                    acciones[JUGARCARTA-JUGARCARTA][i-JUG1]=SI;
-                    acciones[TRUCO-JUGARCARTA][i-JUG1]=NO;
-                    acciones[QUIERO-JUGARCARTA][i-JUG1]=NO;
-                    acciones[NOQUIERO-JUGARCARTA][i-JUG1]=NO;
+                    /*for(i=JUG1;i<JUG1+2*jugadoresporequipo;i++)
+                    {
+                        acciones[QUIERO-JUGARCARTA][i-JUG1]=NO;
+                        acciones[NOQUIERO-JUGARCARTA][i-JUG1]=NO;
+                        acciones[ENVIDO-JUGARCARTA][i-JUG1]=NO;
+                        acciones[REALENVIDO-JUGARCARTA][i-JUG1]=NO;
+                        acciones[FALTAENVIDO-JUGARCARTA][i-JUG1]=NO;
+                        acciones[CANTARTANTO-JUGARCARTA][i-JUG1]=SI;
+                    }*/
+                    for(i=JUG1;i<JUG1+2*jugadoresporequipo;i++)
+                    {
+                        for(j=JUGARCARTA;j<=ALMAZO;j++)
+                        {
+                            acciones[j-JUGARCARTA][i-JUG1]=NO;
+                        }
+                        acciones[CANTARTANTO-JUGARCARTA][i-JUG1]=SI;
+                        acciones[NADA-JUGARCARTA][i-JUG1]=SI;
+                        acciones[CHATTODOS-JUGARCARTA][i-JUG1]=SI;
+                        if(jugadoresporequipo>1)
+                        {
+                            acciones[CHATEQUIPO-JUGARCARTA][i-JUG1]=SI;
+                        }
+                    }
+                    juega=mano-JUG1;
+                    break;
                 }
-                }
-                if(cantotruco==QUIERORETRUCO)
+                else if(cantotruco==TRUCO)//Esto puede ir en una función
                 {
-                for(i=JUG1;i<JUG1+2*jugadoresporequipo;i++)
-                {
-                    acciones[JUGARCARTA-JUGARCARTA][i-JUG1]=SI;
-                    acciones[QUIERORETRUCO-JUGARCARTA][i-JUG1]=NO;
-                    acciones[QUIERO-JUGARCARTA][i-JUG1]=NO;
-                    acciones[NOQUIERO-JUGARCARTA][i-JUG1]=NO;
+                    for(i=JUG1;i<JUG1+2*jugadoresporequipo;i++)
+                    {
+                        acciones[JUGARCARTA-JUGARCARTA][i-JUG1]=SI;
+                        acciones[TRUCO-JUGARCARTA][i-JUG1]=NO;
+                        acciones[QUIERO-JUGARCARTA][i-JUG1]=NO;
+                        acciones[NOQUIERO-JUGARCARTA][i-JUG1]=NO;
+                    }
                 }
-                }
-                if(cantotruco==QUIEROVALECUATRO)
+                else if(cantotruco==QUIERORETRUCO)
                 {
-                for(i=JUG1;i<JUG1+2*jugadoresporequipo;i++)
-                {
-                    acciones[JUGARCARTA-JUGARCARTA][i-JUG1]=SI;
-                    acciones[QUIEROVALECUATRO-JUGARCARTA][i-JUG1]=NO;
-                    acciones[QUIERO-JUGARCARTA][i-JUG1]=NO;
-                    acciones[NOQUIERO-JUGARCARTA][i-JUG1]=NO;
+                    for(i=JUG1;i<JUG1+2*jugadoresporequipo;i++)
+                    {
+                        acciones[JUGARCARTA-JUGARCARTA][i-JUG1]=SI;
+                        acciones[QUIERORETRUCO-JUGARCARTA][i-JUG1]=NO;
+                        acciones[QUIERO-JUGARCARTA][i-JUG1]=NO;
+                        acciones[NOQUIERO-JUGARCARTA][i-JUG1]=NO;
+                    }
                 }
+                else if(cantotruco==QUIEROVALECUATRO)
+                {
+                    for(i=JUG1;i<JUG1+2*jugadoresporequipo;i++)
+                    {
+                        acciones[JUGARCARTA-JUGARCARTA][i-JUG1]=SI;
+                        acciones[QUIEROVALECUATRO-JUGARCARTA][i-JUG1]=NO;
+                        acciones[QUIERO-JUGARCARTA][i-JUG1]=NO;
+                        acciones[NOQUIERO-JUGARCARTA][i-JUG1]=NO;
+                    }
                 }
                 cantotruco=QUIERO;
                 puntossegunda++;
@@ -404,14 +576,91 @@ int main (int argc,char **argv)
                 break;
             case NOQUIERO:
                 printf("%d canta no quiero\n",juega+1);
+                if(cantoenvido!=NO)
+                {
+                    for(i=JUG1;i<JUG1+2*jugadoresporequipo;i++)
+                    {
+                        acciones[CANTARTANTO-JUGARCARTA][i-JUG1]=NO;
+                    }
+                    /*if(juega%2==EQ1%2)
+                    {
+                        eqganaprimera=EQ2;
+                    }
+                    else
+                    {
+                        eqganaprimera=EQ1;
+                    }
+                    if(cantoenvido==CANTARTANTO && malcanto==SI)
+                    {
+                        if(puntosprimera<4)
+                        {
+                            puntosprimera=4;
+                        }
+                        
+                    }*/
+                    if(cantoenvido==CANTARTANTO)
+                    {
+                        if(malcanto==SI)
+                        {
+                            if(puntosprimera<4)
+                            {
+                                puntosprimera=4;
+                            }
+                            if(jugganaprimera%2==EQ1%2)
+                            {
+                                eqganaprimera=EQ2;
+                            }
+                            else
+                            {
+                                eqganaprimera=EQ1;
+                            }
+                        }
+                        else
+                        {
+                            if(jugganaprimera%2==EQ1%2)
+                            {
+                                eqganaprimera=EQ1;
+                            }
+                            else
+                            {
+                                eqganaprimera=EQ2;
+                            }
+                        }
+                    }
+                    else
+                    {
+                        if(juega%2==EQ1%2)
+                        {
+                            eqganaprimera=EQ2;
+                        }
+                        else
+                        {
+                            eqganaprimera=EQ1;
+                        }
+                    }
+                    if(ultimoenjugarcarta!=NADIE)
+                    {
+                        juega=ultimoenjugarcarta+1;
+                        juega%=2*jugadoresporequipo;
+                    }
+                    else
+                    {
+                        juega=mano-JUG1;
+                    }
+                    break;
+                }
                 if(sejuegasegunda==SI)
                 {
                     sejuegasegunda=TERMINO;
                     for(i=JUG1;i<JUG1+2*jugadoresporequipo;i++)
                     {
-                        for(j=0;j<18;j++)
+                        /*for(j=0;j<18;j++)
                         {
                             acciones[j][i-JUG1]=NO;
+                        }*/
+                        for(j=JUGARCARTA;j<=NADA;j++)
+                        {
+                            acciones[j-JUGARCARTA][i-JUG1]=NO;
                         }
                         acciones[ALMAZO-JUGARCARTA][i-JUG1]=SI;
                         acciones[CHATTODOS-JUGARCARTA][i-JUG1]=SI;
@@ -430,6 +679,45 @@ int main (int argc,char **argv)
             case CONFLORMEACHICO:
                 break;
             case CANTARTANTO:
+                printf("Indicar tanto: ");
+                scanf("%d",&tanto);
+                if(cantoenvido!=CANTARTANTO)
+                {
+                    cantoenvido=CANTARTANTO;
+                }
+                if((char)tanto>maxtanto)
+                {
+                    maxtanto=(char)tanto;
+                    jugganaprimera=juega;
+                    if((char)tanto!=tantoenvido[juega-JUG1])
+                    {
+                        malcanto=SI;
+                    }
+                    else
+                    {
+                        malcanto=NO;
+                    }
+                }
+                if(cantoflor!=CANTARTANTO)
+                {
+                    cantoflor=CANTARTANTO;
+                }
+                if((char)tanto>maxtanto)
+                {
+                    maxtanto=(char)tanto;
+                    jugganaprimera=juega;
+                    if((char)tanto!=tantoflor[juega-JUG1])
+                    {
+                        malcanto=SI;
+                    }
+                    else
+                    {
+                        malcanto=NO;
+                    }
+                }
+                acciones[CANTARTANTO-JUGARCARTA][i-JUG1]=NO;
+                juega++;
+                juega%=2*jugadoresporequipo;
                 break;
             case QUIERORETRUCO:
                 printf("%d canta quiero retruco\n",juega+1);
@@ -630,6 +918,16 @@ int main (int argc,char **argv)
         eqganasegunda=EQ1;
     else
         eqganasegunda=EQ2;
+    if(eqganaprimera==EQ1)//Puede hacerse una función que calcule el ganador de la "primera"
+    {
+        puntoseq1+=puntosprimera;
+        printf("Equipo 1 gana %d puntos del truco\n",puntosprimera);
+    }
+    else if(eqganaprimera==EQ2)
+    {
+        puntoseq2+=puntosprimera;
+        printf("Equipo 2 gana %d puntos del truco\n",puntosprimera);
+    }
     if(eqganasegunda==EQ1)//Puede hacerse una función que calcule el ganador de la "segunda"
     {
         puntoseq1+=puntossegunda;
