@@ -10,8 +10,8 @@
 * - Borrar web con make no_html
 * - Agregar archivos .c, Makefile y Doxyfile al repositorio con make svn
 * \author Federico Ariel Marinzalda
-* \version 1.1
-* \date 1/12/2016
+* \version 1.2
+* \date 3/12/2016
 *
 *
 *******************************************************/
@@ -24,7 +24,7 @@ int main (int argc,char **argv)
     unsigned char i,j,k,jugadoresporequipo,carta,cont;
     unsigned char mano=JUG1,tomacarta,maxeq1,maxeq2;
     unsigned char r,s,aux,aux2,flag,min,n,malcanto=NO,jugganaprimera;
-    char max,maxtanto=-1;
+    char max,maxtanto;
     int opcion,opcvalida,naipe,tanto;
     unsigned char hayflor,haypicapica=NO,estilo=REDONDA;
     unsigned char mostrarcartas,palo,valida;
@@ -47,8 +47,8 @@ int main (int argc,char **argv)
                                     {SI,SI,SI,SI,SI,SI},
                                     {NO,NO,NO,NO,NO,NO}};
     unsigned char puntosprimera,puntossegunda,cant;
-    unsigned char eqganaprimera=NADIE,eqganasegunda=NADIE,cantotruco=NO,cantoenvido=NO,cantoflor=NO;
-    unsigned char floresnegadaseq1=0,floresnegadaseq2=0;
+    unsigned char eqganaprimera,eqganasegunda,equltimaflor,eqachico,cantotruco,cantoenvido,cantoflor;
+    unsigned char floresbiencantadas,floresnegadaseq1,floresnegadaseq2;
     unsigned char puntoseq1=0,puntoseq2=0,enmazo,enmazoeq1,enmazoeq2,juega;
     unsigned char sejuegaprimera,sejuegasegunda,ultimoenjugarcarta;
     char tantoenvido[6]={-1,-1,-1,-1,-1,-1},tantoflor[6]={-1,-1,-1,-1,-1,-1};
@@ -109,6 +109,10 @@ int main (int argc,char **argv)
     configurarcartas(cartas);
     calcularvalorescartas(cartas,valorcartaparaprimera,valorcartaparasegunda);
     printf("\nRepartiendo cartas ...\n\n");
+    maxtanto=-1;
+    floresbiencantadas=0;
+    floresnegadaseq1=floresnegadaseq2=0;
+    
     repartircartas(cartas,cartasrepartidas,mano,jugadoresporequipo);
     calculotanto(cartas,cartasrepartidas,valorcartaparaprimera,tantoenvido,tantoflor,jugadoresporequipo,hayflor);
     cont=0;
@@ -162,6 +166,8 @@ int main (int argc,char **argv)
     enmazo=enmazoeq1=enmazoeq2=0;
     sejuegaprimera=sejuegasegunda=NO;
     ultimoenjugarcarta=NADIE;
+    cantotruco=cantoenvido=cantoflor=NO;
+    eqganaprimera=NADIE;
     while(enmazo<2*jugadoresporequipo)//Hacer función de juego
     {
         printf("Opciones para jugador %d:\n",juega+1);
@@ -470,10 +476,110 @@ int main (int argc,char **argv)
                 }
                 break;
             case FLOR:
+                printf("%d canta flor\n",juega+1);
+                if(sejuegaprimera==NO)
+                {
+                    sejuegaprimera==SI;
+                }
+                cantoenvido=NO;
+                if(cantoflor==NO)
+                {
+                    cantoflor=FLOR;
+                    
+                }
+                acciones[FLOR-JUGARCARTA][juega]=NO;
+                for(i=JUG1;i<JUG1+2*jugadoresporequipo;i++)
+                {
+                    acciones[JUGARCARTA-JUGARCARTA][i-JUG1]=NO;
+                    acciones[ENVIDO-JUGARCARTA][i-JUG1]=NO;
+                    acciones[REALENVIDO-JUGARCARTA][i-JUG1]=NO;
+                    acciones[FALTAENVIDO-JUGARCARTA][i-JUG1]=NO;
+                    if(juega%2!=i%2)
+                    {
+                        acciones[QUIERO-JUGARCARTA][i-JUG1]=SI;
+                        acciones[NOQUIERO-JUGARCARTA][i-JUG1]=SI;
+                        acciones[CONTRAFLOR-JUGARCARTA][i-JUG1]=SI;
+                        acciones[CONTRAFLORALRESTO-JUGARCARTA][i-JUG1]=SI;
+                    }
+                    else
+                    {
+                        acciones[QUIERO-JUGARCARTA][i-JUG1]=NO;
+                        acciones[NOQUIERO-JUGARCARTA][i-JUG1]=NO;
+                        acciones[CONTRAFLOR-JUGARCARTA][i-JUG1]=NO;
+                        acciones[CONTRAFLORALRESTO-JUGARCARTA][i-JUG1]=NO;
+                    }
+                }
+                if(tantoflor!=-1)
+                {
+                    if(juega%2==EQ1%2)
+                    {
+                        floresnegadaseq1++;
+                    }
+                    else
+                    {
+                        floresnegadaseq2++;
+                    }
+                }
+                else
+                {
+                    floresbiencantadas++;
+                    if(juega%2==EQ1%2)
+                    {
+                        equltimaflor=EQ1;
+                    }
+                    else
+                    {
+                        equltimaflor=EQ2;
+                    }
+                }
                 break;
             case CONTRAFLOR:
+                cantoflor=CONTRAFLOR;
+                for(i=JUG1;i<JUG1+2*jugadoresporequipo;i++)
+                {
+                    if(juega%2!=i%2)
+                    {
+                        acciones[QUIERO-JUGARCARTA][i-JUG1]=SI;
+                        acciones[NOQUIERO-JUGARCARTA][i-JUG1]=SI;
+                        acciones[CONTRAFLOR-JUGARCARTA][i-JUG1]=NO;
+                        acciones[CONTRAFLORALRESTO-JUGARCARTA][i-JUG1]=SI;
+                    }
+                    else
+                    {
+                        acciones[QUIERO-JUGARCARTA][i-JUG1]=NO;
+                        acciones[NOQUIERO-JUGARCARTA][i-JUG1]=NO;
+                        acciones[CONTRAFLOR-JUGARCARTA][i-JUG1]=NO;
+                        acciones[CONTRAFLORALRESTO-JUGARCARTA][i-JUG1]=NO;
+                    }
+                }
+                if(floresbiencantadas==1)
+                {
+                    floresbiencantadas++;
+                }
                 break;
             case CONTRAFLORALRESTO:
+                cantoflor=CONTRAFLORALRESTO;
+                for(i=JUG1;i<JUG1+2*jugadoresporequipo;i++)
+                {
+                    if(juega%2!=i%2)
+                    {
+                        acciones[QUIERO-JUGARCARTA][i-JUG1]=SI;
+                        acciones[NOQUIERO-JUGARCARTA][i-JUG1]=SI;
+                        acciones[CONTRAFLOR-JUGARCARTA][i-JUG1]=NO;
+                        acciones[CONTRAFLORALRESTO-JUGARCARTA][i-JUG1]=NO;
+                    }
+                    else
+                    {
+                        acciones[QUIERO-JUGARCARTA][i-JUG1]=NO;
+                        acciones[NOQUIERO-JUGARCARTA][i-JUG1]=NO;
+                        acciones[CONTRAFLOR-JUGARCARTA][i-JUG1]=NO;
+                        acciones[CONTRAFLORALRESTO-JUGARCARTA][i-JUG1]=NO;
+                    }
+                }
+                if(floresbiencantadas==1)
+                {
+                    floresbiencantadas++;
+                }
                 break;
             case TRUCO:
                 printf("%d canta truco\n",juega+1);
@@ -529,8 +635,54 @@ int main (int argc,char **argv)
                             acciones[CHATEQUIPO-JUGARCARTA][i-JUG1]=SI;
                         }
                     }
+                    if(cantoenvido==ENVIDO)
+                    {
+                        puntosprimera=2;
+                    }
+                    else if(cantoenvido==ENVIDOENVIDO)
+                    {
+                        puntosprimera=4;
+                    }
+                    else if(cantoenvido==REALENVIDO)
+                    {
+                        if(puntosprimera==1)
+                        {
+                            puntosprimera=3;
+                        }
+                        if(puntosprimera==2)
+                        {
+                            puntosprimera=5;
+                        }
+                        if(puntosprimera==4)
+                        {
+                            puntosprimera=7;
+                        }
+                    }
+                    else if(cantoenvido==FALTAENVIDO)
+                    {
+                        if(puntoseq1>puntoseq2)
+                        {
+                            puntosprimera=30-puntoseq1;
+                        }
+                        else
+                        {
+                            puntosprimera=30-puntoseq2;
+                        }
+                    }
                     juega=mano-JUG1;
                     break;
+                }
+                if(cantoflor==CONTRAFLORALRESTO)
+                {
+                    puntosprimera=3*floresbiencantadas;
+                    if(puntoseq1>puntoseq2)
+                    {
+                        puntosprimera=puntosprimera+30-puntoseq1;
+                    }
+                    else
+                    {
+                        puntosprimera=puntosprimera+30-puntoseq2;
+                    }
                 }
                 else if(cantotruco==TRUCO)//Esto puede ir en una función
                 {
@@ -649,9 +801,63 @@ int main (int argc,char **argv)
                     }
                     break;
                 }
+                else if(cantoflor!=NO)
+                {
+                    if(cantoflor==CANTARTANTO)
+                    {
+                        if(malcanto==NO)
+                        {
+                            if(jugganaprimera%2==EQ1%2)
+                            {
+                                eqganaprimera=EQ1;
+                            }
+                            else
+                            {
+                                eqganaprimera=EQ2;
+                            }
+                        }
+                        else
+                        {
+                            puntosprimera=0;
+                        }
+                    }
+                    else if(cantoflor==FLOR)
+                    {
+                        eqganaprimera=equltimaflor;
+                        puntosprimera=3*floresbiencantadas;
+                    }
+                    else if(cantoflor=eqachico)
+                    {
+                        eqganaprimera=JUG1+(eqachico+1)%2;
+                        puntosprimera=3*floresbiencantadas-2;
+                        if(puntosprimera<4)
+                        {
+                            puntosprimera=4;
+                        }
+                    }
+                }
+                i=juega+1;
+                i%=2*jugadoresporequipo;
+                while(i!=juega)
+                {
+                    if(tantoflor!=-1)
+                    {
+                        if(i%2==EQ1%2)
+                        {
+                            floresnegadaseq1++;
+                        }
+                        else
+                        {
+                            floresnegadaseq2++;
+                        }
+                    }
+                    i++;
+                    i%=2*jugadoresporequipo;
+                }
                 if(sejuegasegunda==SI)
                 {
-                    sejuegasegunda=TERMINO;
+                    //sejuegasegunda=TERMINO;
+                    sejuegasegunda=NO;
                     for(i=JUG1;i<JUG1+2*jugadoresporequipo;i++)
                     {
                         /*for(j=0;j<18;j++)
@@ -677,6 +883,23 @@ int main (int argc,char **argv)
                 }
                 break;
             case CONFLORMEACHICO:
+                printf("%d canta con flor me achico\n",juega+1);
+                for(i=JUG1;i<JUG1+2*jugadoresporequipo;i++)
+                {
+                    for(j=ENVIDO;j<=CONTRAFLORALRESTO;j++)
+                    {
+                        acciones[j-JUGARCARTA][i-JUG1]=NO;
+                    }
+                    acciones[CONFLORMEACHICO-JUGARCARTA][i-JUG1]=NO;
+                }
+                if(juega%2==EQ1%2)
+                {
+                    eqachico=EQ1;
+                }
+                else
+                {
+                    eqachico=EQ2;
+                }
                 break;
             case CANTARTANTO:
                 printf("Indicar tanto: ");
@@ -709,6 +932,14 @@ int main (int argc,char **argv)
                     if((char)tanto!=tantoflor[juega-JUG1])
                     {
                         malcanto=SI;
+                        if(juega%2==EQ1%2)
+                        {
+                            floresnegadaseq1++;
+                        }
+                        else
+                        {
+                            floresnegadaseq2++;
+                        }
                     }
                     else
                     {
@@ -829,6 +1060,19 @@ int main (int argc,char **argv)
                 printf("%d dice: %s\n",juega,mensaje);
                 break;
             case NADA:
+                //if(cantoflor==FLOR)
+                if(hayflor==SI)
+                {
+                    acciones[FLOR-JUGARCARTA][juega]=NO;
+                    if(juega%2==EQ1%2)
+                    {
+                        floresnegadaseq1++;
+                    }
+                    else
+                    {
+                        floresnegadaseq2++;
+                    }
+                }
                 for(i=0;i<2*jugadoresporequipo;i++)
                 {
                     if(juega==mazo[i])
@@ -881,7 +1125,8 @@ int main (int argc,char **argv)
                 cartasjugadastruco[i]=-2;
             bazasjugadas++;
             if(bazasjugadas==3)
-                sejuegasegunda=TERMINO;
+                //sejuegasegunda=TERMINO;
+                sejuegasegunda=NO;
         }
         if(bazasjugadas==2)
         {
@@ -927,6 +1172,24 @@ int main (int argc,char **argv)
     {
         puntoseq2+=puntosprimera;
         printf("Equipo 2 gana %d puntos del truco\n",puntosprimera);
+    }
+    if(floresnegadaseq1>0 || floresnegadaseq2>0)
+    {
+        printf("Hubo %d flores negadas o mal cantadas del equipo 1 y %d del equipo 2\n");
+        if(floresnegadaseq1>floresnegadaseq2)
+        {
+            printf("Equipo 2 gana %d puntos\n",3*(floresnegadaseq1-floresnegadaseq2));
+            puntoseq2+=3*(floresnegadaseq1-floresnegadaseq2);
+        }
+        else if(floresnegadaseq1<floresnegadaseq2)
+        {
+            printf("Equipo 1 gana %d puntos\n",3*(floresnegadaseq2-floresnegadaseq1));
+            puntoseq1+=3*(floresnegadaseq2-floresnegadaseq1);
+        }
+        else
+        {
+            printf("Al haber la misma cantidad, nadie suma puntos\n");
+        }
     }
     if(eqganasegunda==EQ1)//Puede hacerse una función que calcule el ganador de la "segunda"
     {
