@@ -47,16 +47,16 @@ int main (int argc,char **argv)
                                     {SI,SI,SI,SI,SI,SI},
                                     {NO,NO,NO,NO,NO,NO}};
     unsigned char puntosprimera,puntossegunda,cant;
-    unsigned char eqganaprimera,eqganasegunda,equltimaflor,eqachico,cantotruco,cantoenvido,cantoflor;
+    unsigned char eqganaprimera,eqganasegunda,equltimaflor,eqachico,eqcantotruco,cantotruco,cantoenvido,cantoflor;
     unsigned char floresbiencantadas,floresnegadaseq1,floresnegadaseq2;
     unsigned char puntoseq1=0,puntoseq2=0,enmazo,enmazoeq1,enmazoeq2,juega;
     unsigned char sejuegaprimera,sejuegasegunda,ultimoenjugarcarta;
-    char tantoenvido[6]={-1,-1,-1,-1,-1,-1},tantoflor[6]={-1,-1,-1,-1,-1,-1},penalizacionflor[6]={NO,NO,NO,NO,NO,NO};
+    char tantoenvido[6]={-1,-1,-1,-1,-1,-1},tantoflor[6]={-1,-1,-1,-1,-1,-1},penalizacionflor[6]={NO,NO,NO,NO,NO,NO},cantobienflor[6]={NO,NO,NO,NO,NO,NO};
     unsigned char valorcartaparaprimera[4][10]={0},valorcartaparasegunda[4][10]={0};
     char mensaje[LARGOMSG+1];
     baraja_t cartas[4][10],cartasrepartidas[6][3]={0};
     unsigned char baza[3]={PARDA,PARDA,PARDA},bazaseq1,bazaseq2,mazo[6],bazasjugadas;
-    unsigned char ordencartasjugadas[6][3]={0},bazaterminada;
+    unsigned char ordencartasjugadas[6][3]={0},bazaterminada,senal;
     char cartasjugadastruco[6]={-2,-2,-2,-2,-2,-2};
     if(argc<3)
     {
@@ -163,10 +163,11 @@ int main (int argc,char **argv)
     sejuegaprimera=sejuegasegunda=NO;
     ultimoenjugarcarta=NADIE;
     cantotruco=cantoenvido=cantoflor=NO;
-    eqganaprimera=NADIE;
+    eqganaprimera=eqcantotruco=NADIE;
     maxtanto=-1;
     floresbiencantadas=0;
     floresnegadaseq1=floresnegadaseq2=0;
+    senal=0;
     while(enmazo<2*jugadoresporequipo)//Hacer función de juego
     {
         printf("Opciones para jugador %d:\n",juega+1);
@@ -325,18 +326,42 @@ int main (int argc,char **argv)
                 }
                 if(hayflor==SI)
                 {
-                    if(tantoflor[juega]!=-1 && penalizacionflor[juega]==NO)
+                    if(tantoflor[juega]!=-1)
+                    //if(tantoflor[juega]!=-1 && ordencartasjugadas[juega][0]*ordencartasjugadas[juega][1]*ordencartasjugadas[juega][2]==0)
                     {
-                        penalizacionflor[juega]=SI;
-                        if(juega%2==EQ1%2)
+                        if(penalizacionflor[juega]==NO && cantobienflor[juega]==NO && ordencartasjugadas[juega][1]<=VALORTRUCO4)
                         {
-                            floresnegadaseq1++;
-                        }
-                        else
-                        {
-                            floresnegadaseq2++;
+                            penalizacionflor[juega]=SI;
+                            if(juega%2==EQ1%2)
+                            {
+                                floresnegadaseq1++;
+                            }
+                            else
+                            {
+                                floresnegadaseq2++;
+                            }
                         }
                     }
+                    else if(cantobienflor[juega]==NO)
+                    {
+                        cantobienflor[juega]=SI;
+                    }
+                    for(j=FLOR;j<=CONTRAFLORALRESTO;j++)
+                    {
+                        acciones[j-JUGARCARTA][juega]=NO;
+                    }
+                }
+                senal=0;
+                for(i=JUG1;i<JUG1+2*jugadoresporequipo;i++)
+                {
+                    if(cartasjugadastruco[i]<=VALORTRUCO4)
+                    {
+                        senal=1;
+                    }
+                }
+                if(senal==0)
+                {
+                    sejuegaprimera=TERMINO;
                 }
                 juega++;
                 juega%=2*jugadoresporequipo;
@@ -516,7 +541,6 @@ int main (int argc,char **argv)
                 if(cantoflor==NO)
                 {
                     cantoflor=FLOR;
-                    
                 }
                 acciones[FLOR-JUGARCARTA][juega]=NO;
                 for(i=JUG1;i<JUG1+2*jugadoresporequipo;i++)
@@ -540,7 +564,7 @@ int main (int argc,char **argv)
                         acciones[CONTRAFLORALRESTO-JUGARCARTA][i-JUG1]=NO;
                     }
                 }
-                if(tantoflor[juega]!=-1 && penalizacionflor[juega]==NO)
+                if(tantoflor[juega]==-1 && penalizacionflor[juega]==NO)
                 {
                     penalizacionflor[juega]=SI;
                     if(juega%2==EQ1%2)
@@ -554,6 +578,7 @@ int main (int argc,char **argv)
                 }
                 else
                 {
+                    cantobienflor[juega]=SI;
                     floresbiencantadas++;
                     if(juega%2==EQ1%2)
                     {
@@ -584,9 +609,33 @@ int main (int argc,char **argv)
                         acciones[CONTRAFLORALRESTO-JUGARCARTA][i-JUG1]=NO;
                     }
                 }
-                if(floresbiencantadas==1)
+                if(tantoflor[juega]==-1 && penalizacionflor[juega]==NO)
                 {
-                    floresbiencantadas++;
+                    penalizacionflor[juega]=SI;
+                    if(juega%2==EQ1%2)
+                    {
+                        floresnegadaseq1++;
+                    }
+                    else
+                    {
+                        floresnegadaseq2++;
+                    }
+                }
+                else
+                {
+                    cantobienflor[juega]=SI;
+                    if(floresbiencantadas==1)
+                    {
+                        floresbiencantadas++;
+                    }
+                    if(juega%2==EQ1%2)
+                    {
+                        equltimaflor=EQ1;
+                    }
+                    else
+                    {
+                        equltimaflor=EQ2;
+                    }
                 }
                 break;
             case CONTRAFLORALRESTO:
@@ -608,15 +657,40 @@ int main (int argc,char **argv)
                         acciones[CONTRAFLORALRESTO-JUGARCARTA][i-JUG1]=NO;
                     }
                 }
-                if(floresbiencantadas==1)
+                if(tantoflor[juega]==-1 && penalizacionflor[juega]==NO)
                 {
-                    floresbiencantadas++;
+                    penalizacionflor[juega]=SI;
+                    if(juega%2==EQ1%2)
+                    {
+                        floresnegadaseq1++;
+                    }
+                    else
+                    {
+                        floresnegadaseq2++;
+                    }
+                }
+                else
+                {
+                    cantobienflor[juega]=SI;
+                    if(floresbiencantadas==1)
+                    {
+                        floresbiencantadas++;
+                    }
+                    if(juega%2==EQ1%2)
+                    {
+                        equltimaflor=EQ1;
+                    }
+                    else
+                    {
+                        equltimaflor=EQ2;
+                    }
                 }
                 break;
             case TRUCO:
                 printf("%d canta truco\n",juega+1);
                 sejuegasegunda=SI;
                 cantotruco=TRUCO;
+                eqcantotruco=juega%2;
                 for(i=JUG1;i<JUG1+2*jugadoresporequipo;i++)//Este for puede ir en una función
                 {
                     acciones[JUGARCARTA-JUGARCARTA][i-JUG1]=NO;
@@ -741,6 +815,7 @@ int main (int argc,char **argv)
                         acciones[TRUCO-JUGARCARTA][i-JUG1]=NO;
                         acciones[QUIERO-JUGARCARTA][i-JUG1]=NO;
                         acciones[NOQUIERO-JUGARCARTA][i-JUG1]=NO;
+                        cantotruco=TRUCOQUERIDO;
                     }
                 }
                 else if(cantotruco==QUIERORETRUCO)
@@ -751,6 +826,7 @@ int main (int argc,char **argv)
                         acciones[QUIERORETRUCO-JUGARCARTA][i-JUG1]=NO;
                         acciones[QUIERO-JUGARCARTA][i-JUG1]=NO;
                         acciones[NOQUIERO-JUGARCARTA][i-JUG1]=NO;
+                        cantotruco=RETRUCOQUERIDO;
                     }
                 }
                 else if(cantotruco==QUIEROVALECUATRO)
@@ -761,9 +837,10 @@ int main (int argc,char **argv)
                         acciones[QUIEROVALECUATRO-JUGARCARTA][i-JUG1]=NO;
                         acciones[QUIERO-JUGARCARTA][i-JUG1]=NO;
                         acciones[NOQUIERO-JUGARCARTA][i-JUG1]=NO;
+                        cantotruco=VALECUATROQUERIDO;
                     }
                 }
-                cantotruco=QUIERO;
+                //cantotruco=QUIERO;
                 puntossegunda++;
                 if(ultimoenjugarcarta!=NADIE)
                 {
@@ -800,9 +877,105 @@ int main (int argc,char **argv)
                         {
                             acciones[j-JUGARCARTA][i-JUG1]=NO;
                         }
-                        for(j=TRUCO;j<=QUIEROVALECUATRO;j++)
+                        /*for(j=TRUCO;j<=QUIEROVALECUATRO;j++)
                         {
                             acciones[j-JUGARCARTA][i-JUG1]=SI;
+                        }*/
+                        if(cantotruco==NO)
+                        {
+                            acciones[TRUCO-JUGARCARTA][i-JUG1]=SI;
+                            acciones[QUIERO-JUGARCARTA][i-JUG1]=NO;
+                            acciones[NOQUIERO-JUGARCARTA][i-JUG1]=NO;
+                            acciones[QUIERORETRUCO-JUGARCARTA][i-JUG1]=NO;
+                            acciones[QUIEROVALECUATRO-JUGARCARTA][i-JUG1]=NO;
+                        }
+                        else if(cantotruco==TRUCO)
+                        {
+                            acciones[TRUCO-JUGARCARTA][i-JUG1]=NO;
+                            acciones[QUIEROVALECUATRO-JUGARCARTA][i-JUG1]=NO;
+                            if(eqcantotruco==i%2)
+                            {
+                                acciones[QUIERO-JUGARCARTA][i-JUG1]=NO;
+                                acciones[QUIERORETRUCO-JUGARCARTA][i-JUG1]=NO;
+                                acciones[NOQUIERO-JUGARCARTA][i-JUG1]=NO;
+                            }
+                            else
+                            {
+                                acciones[QUIERO-JUGARCARTA][i-JUG1]=SI;
+                                acciones[QUIERORETRUCO-JUGARCARTA][i-JUG1]=SI;
+                                acciones[NOQUIERO-JUGARCARTA][i-JUG1]=SI;
+                            }
+                        }
+                        else if(cantotruco==TRUCOQUERIDO)
+                        {
+                            acciones[TRUCO-JUGARCARTA][i-JUG1]=NO;
+                            acciones[QUIERO-JUGARCARTA][i-JUG1]=NO;
+                            acciones[NOQUIERO-JUGARCARTA][i-JUG1]=NO;
+                            acciones[QUIEROVALECUATRO-JUGARCARTA][i-JUG1]=NO;
+                            if(eqcantotruco==i%2)
+                            {
+                                acciones[QUIERORETRUCO-JUGARCARTA][i-JUG1]=NO;
+                            }
+                            else
+                            {
+                                acciones[QUIERORETRUCO-JUGARCARTA][i-JUG1]=SI;
+                            }
+                        }
+                        else if(cantotruco==QUIERORETRUCO)
+                        {
+                            acciones[TRUCO-JUGARCARTA][i-JUG1]=NO;
+                            acciones[QUIERORETRUCO-JUGARCARTA][i-JUG1]=NO;
+                            if(eqcantotruco==i%2)
+                            {
+                                acciones[QUIERO-JUGARCARTA][i-JUG1]=NO;
+                                acciones[QUIEROVALECUATRO-JUGARCARTA][i-JUG1]=NO;
+                                acciones[NOQUIERO-JUGARCARTA][i-JUG1]=NO;
+                            }
+                            else
+                            {
+                                acciones[QUIERO-JUGARCARTA][i-JUG1]=SI;
+                                acciones[QUIEROVALECUATRO-JUGARCARTA][i-JUG1]=SI;
+                                acciones[NOQUIERO-JUGARCARTA][i-JUG1]=SI;
+                            }
+                        }
+                        else if(cantotruco==RETRUCOQUERIDO)
+                        {
+                            acciones[TRUCO-JUGARCARTA][i-JUG1]=NO;
+                            acciones[QUIERO-JUGARCARTA][i-JUG1]=NO;
+                            acciones[NOQUIERO-JUGARCARTA][i-JUG1]=NO;
+                            acciones[QUIERORETRUCO-JUGARCARTA][i-JUG1]=NO;
+                            if(eqcantotruco==i%2)
+                            {
+                                acciones[QUIEROVALECUATRO-JUGARCARTA][i-JUG1]=NO;
+                            }
+                            else
+                            {
+                                acciones[QUIEROVALECUATRO-JUGARCARTA][i-JUG1]=SI;
+                            }
+                        }
+                        else if(cantotruco==QUIEROVALECUATRO)
+                        {
+                            acciones[TRUCO-JUGARCARTA][i-JUG1]=NO;
+                            acciones[QUIERORETRUCO-JUGARCARTA][i-JUG1]=NO;
+                            acciones[QUIEROVALECUATRO-JUGARCARTA][i-JUG1]=NO;
+                            if(eqcantotruco==i%2)
+                            {
+                                acciones[QUIERO-JUGARCARTA][i-JUG1]=NO;
+                                acciones[NOQUIERO-JUGARCARTA][i-JUG1]=NO;
+                            }
+                            else
+                            {
+                                acciones[QUIERO-JUGARCARTA][i-JUG1]=SI;
+                                acciones[NOQUIERO-JUGARCARTA][i-JUG1]=SI;
+                            }
+                        }
+                        else if(cantotruco==VALECUATROQUERIDO)
+                        {
+                            acciones[TRUCO-JUGARCARTA][i-JUG1]=NO;
+                            acciones[QUIERO-JUGARCARTA][i-JUG1]=NO;
+                            acciones[NOQUIERO-JUGARCARTA][i-JUG1]=NO;
+                            acciones[QUIERORETRUCO-JUGARCARTA][i-JUG1]=NO;
+                            acciones[QUIEROVALECUATRO-JUGARCARTA][i-JUG1]=NO;
                         }
                         //acciones[ALMAZO-JUGARCARTA][i-JUG1]=SI;
                         //acciones[CHATTODOS-JUGARCARTA][i-JUG1]=SI;
@@ -874,7 +1047,8 @@ int main (int argc,char **argv)
                     {
                         juega=mano-JUG1;
                     }
-                    cantoenvido=NO;
+                    //cantoenvido=NO;
+                    cantoenvido=TERMINO;
                 }
                 else if(cantoflor!=NO)
                 {
@@ -894,9 +1068,105 @@ int main (int argc,char **argv)
                         {
                             acciones[j-JUGARCARTA][i-JUG1]=NO;
                         }
-                        for(j=TRUCO;j<=QUIEROVALECUATRO;j++)
+                        /*for(j=TRUCO;j<=QUIEROVALECUATRO;j++)
                         {
                             acciones[j-JUGARCARTA][i-JUG1]=SI;
+                        }*/
+                        if(cantotruco==NO)
+                        {
+                            acciones[TRUCO-JUGARCARTA][i-JUG1]=SI;
+                            acciones[QUIERO-JUGARCARTA][i-JUG1]=NO;
+                            acciones[NOQUIERO-JUGARCARTA][i-JUG1]=NO;
+                            acciones[QUIERORETRUCO-JUGARCARTA][i-JUG1]=NO;
+                            acciones[QUIEROVALECUATRO-JUGARCARTA][i-JUG1]=NO;
+                        }
+                        else if(cantotruco==TRUCO)
+                        {
+                            acciones[TRUCO-JUGARCARTA][i-JUG1]=NO;
+                            acciones[QUIEROVALECUATRO-JUGARCARTA][i-JUG1]=NO;
+                            if(eqcantotruco==i%2)
+                            {
+                                acciones[QUIERO-JUGARCARTA][i-JUG1]=NO;
+                                acciones[QUIERORETRUCO-JUGARCARTA][i-JUG1]=NO;
+                                acciones[NOQUIERO-JUGARCARTA][i-JUG1]=NO;
+                            }
+                            else
+                            {
+                                acciones[QUIERO-JUGARCARTA][i-JUG1]=SI;
+                                acciones[QUIERORETRUCO-JUGARCARTA][i-JUG1]=SI;
+                                acciones[NOQUIERO-JUGARCARTA][i-JUG1]=SI;
+                            }
+                        }
+                        else if(cantotruco==TRUCOQUERIDO)
+                        {
+                            acciones[TRUCO-JUGARCARTA][i-JUG1]=NO;
+                            acciones[QUIERO-JUGARCARTA][i-JUG1]=NO;
+                            acciones[NOQUIERO-JUGARCARTA][i-JUG1]=NO;
+                            acciones[QUIEROVALECUATRO-JUGARCARTA][i-JUG1]=NO;
+                            if(eqcantotruco==i%2)
+                            {
+                                acciones[QUIERORETRUCO-JUGARCARTA][i-JUG1]=NO;
+                            }
+                            else
+                            {
+                                acciones[QUIERORETRUCO-JUGARCARTA][i-JUG1]=SI;
+                            }
+                        }
+                        else if(cantotruco==QUIERORETRUCO)
+                        {
+                            acciones[TRUCO-JUGARCARTA][i-JUG1]=NO;
+                            acciones[QUIERORETRUCO-JUGARCARTA][i-JUG1]=NO;
+                            if(eqcantotruco==i%2)
+                            {
+                                acciones[QUIERO-JUGARCARTA][i-JUG1]=NO;
+                                acciones[QUIEROVALECUATRO-JUGARCARTA][i-JUG1]=NO;
+                                acciones[NOQUIERO-JUGARCARTA][i-JUG1]=NO;
+                            }
+                            else
+                            {
+                                acciones[QUIERO-JUGARCARTA][i-JUG1]=SI;
+                                acciones[QUIEROVALECUATRO-JUGARCARTA][i-JUG1]=SI;
+                                acciones[NOQUIERO-JUGARCARTA][i-JUG1]=SI;
+                            }
+                        }
+                        else if(cantotruco==RETRUCOQUERIDO)
+                        {
+                            acciones[TRUCO-JUGARCARTA][i-JUG1]=NO;
+                            acciones[QUIERO-JUGARCARTA][i-JUG1]=NO;
+                            acciones[NOQUIERO-JUGARCARTA][i-JUG1]=NO;
+                            acciones[QUIERORETRUCO-JUGARCARTA][i-JUG1]=NO;
+                            if(eqcantotruco==i%2)
+                            {
+                                acciones[QUIEROVALECUATRO-JUGARCARTA][i-JUG1]=NO;
+                            }
+                            else
+                            {
+                                acciones[QUIEROVALECUATRO-JUGARCARTA][i-JUG1]=SI;
+                            }
+                        }
+                        else if(cantotruco==QUIEROVALECUATRO)
+                        {
+                            acciones[TRUCO-JUGARCARTA][i-JUG1]=NO;
+                            acciones[QUIERORETRUCO-JUGARCARTA][i-JUG1]=NO;
+                            acciones[QUIEROVALECUATRO-JUGARCARTA][i-JUG1]=NO;
+                            if(eqcantotruco==i%2)
+                            {
+                                acciones[QUIERO-JUGARCARTA][i-JUG1]=NO;
+                                acciones[NOQUIERO-JUGARCARTA][i-JUG1]=NO;
+                            }
+                            else
+                            {
+                                acciones[QUIERO-JUGARCARTA][i-JUG1]=SI;
+                                acciones[NOQUIERO-JUGARCARTA][i-JUG1]=SI;
+                            }
+                        }
+                        else if(cantotruco==VALECUATROQUERIDO)
+                        {
+                            acciones[TRUCO-JUGARCARTA][i-JUG1]=NO;
+                            acciones[QUIERO-JUGARCARTA][i-JUG1]=NO;
+                            acciones[NOQUIERO-JUGARCARTA][i-JUG1]=NO;
+                            acciones[QUIERORETRUCO-JUGARCARTA][i-JUG1]=NO;
+                            acciones[QUIEROVALECUATRO-JUGARCARTA][i-JUG1]=NO;
                         }
                         //acciones[ALMAZO-JUGARCARTA][i-JUG1]=SI;
                         //acciones[CHATTODOS-JUGARCARTA][i-JUG1]=SI;
@@ -925,6 +1195,10 @@ int main (int argc,char **argv)
                     {
                         eqganaprimera=equltimaflor;
                         puntosprimera=3*floresbiencantadas;
+                        if(floresbiencantadas==0)
+                        {
+                            eqganaprimera=NADIE;
+                        }
                     }
                     else if(cantoflor==eqachico)
                     {
@@ -935,7 +1209,8 @@ int main (int argc,char **argv)
                             puntosprimera=4;
                         }
                     }
-                    cantoflor=NO;
+                    //cantoflor=NO;
+                    cantoflor=TERMINO;
                 }
                 //if(sejuegasegunda==NO)
                 if(sejuegasegunda==SI)
@@ -945,8 +1220,9 @@ int main (int argc,char **argv)
                     i%=2*jugadoresporequipo;
                     while(i!=juega)
                     {
-                        if(tantoflor[i]!=-1)
+                        if(tantoflor[i]!=-1 && penalizacionflor[juega]==NO && cantobienflor[juega]==NO)
                         {
+                            penalizacionflor[juega]=SI;
                             if(i%2==EQ1%2)
                             {
                                 floresnegadaseq1++;
@@ -959,7 +1235,6 @@ int main (int argc,char **argv)
                         i++;
                         i%=2*jugadoresporequipo;
                     }
-                    sejuegasegunda=SI;
                     for(i=JUG1;i<JUG1+2*jugadoresporequipo;i++)
                     {
                         if(ordencartasjugadas[juega][0]*ordencartasjugadas[juega][1]*ordencartasjugadas[juega][2]==0)
@@ -980,11 +1255,124 @@ int main (int argc,char **argv)
                         {
                             acciones[j-JUGARCARTA][i-JUG1]=SI;
                         }*/
-                        acciones[TRUCO-JUGARCARTA][i-JUG1]=SI;
+                        /*for(j=TRUCO;j<=QUIEROVALECUATRO;j++)
+                        {
+                            acciones[j-JUGARCARTA][i-JUG1]=SI;
+                        }*/
+                        if(cantotruco==NO)
+                        {
+                            acciones[TRUCO-JUGARCARTA][i-JUG1]=SI;
+                            acciones[QUIERO-JUGARCARTA][i-JUG1]=NO;
+                            acciones[NOQUIERO-JUGARCARTA][i-JUG1]=NO;
+                            acciones[QUIERORETRUCO-JUGARCARTA][i-JUG1]=NO;
+                            acciones[QUIEROVALECUATRO-JUGARCARTA][i-JUG1]=NO;
+                        }
+                        else if(cantotruco==TRUCO)
+                        {
+                            acciones[TRUCO-JUGARCARTA][i-JUG1]=NO;
+                            acciones[QUIEROVALECUATRO-JUGARCARTA][i-JUG1]=NO;
+                            if(eqcantotruco==i%2)
+                            {
+                                acciones[QUIERO-JUGARCARTA][i-JUG1]=NO;
+                                acciones[QUIERORETRUCO-JUGARCARTA][i-JUG1]=NO;
+                                acciones[NOQUIERO-JUGARCARTA][i-JUG1]=NO;
+                            }
+                            else
+                            {
+                                acciones[QUIERO-JUGARCARTA][i-JUG1]=SI;
+                                acciones[QUIERORETRUCO-JUGARCARTA][i-JUG1]=SI;
+                                acciones[NOQUIERO-JUGARCARTA][i-JUG1]=SI;
+                            }
+                        }
+                        else if(cantotruco==TRUCOQUERIDO)
+                        {
+                            acciones[TRUCO-JUGARCARTA][i-JUG1]=NO;
+                            acciones[QUIERO-JUGARCARTA][i-JUG1]=NO;
+                            acciones[NOQUIERO-JUGARCARTA][i-JUG1]=NO;
+                            acciones[QUIEROVALECUATRO-JUGARCARTA][i-JUG1]=NO;
+                            if(eqcantotruco==i%2)
+                            {
+                                acciones[QUIERORETRUCO-JUGARCARTA][i-JUG1]=NO;
+                            }
+                            else
+                            {
+                                acciones[QUIERORETRUCO-JUGARCARTA][i-JUG1]=SI;
+                            }
+                        }
+                        else if(cantotruco==QUIERORETRUCO)
+                        {
+                            acciones[TRUCO-JUGARCARTA][i-JUG1]=NO;
+                            acciones[QUIERORETRUCO-JUGARCARTA][i-JUG1]=NO;
+                            if(eqcantotruco==i%2)
+                            {
+                                acciones[QUIERO-JUGARCARTA][i-JUG1]=NO;
+                                acciones[QUIEROVALECUATRO-JUGARCARTA][i-JUG1]=NO;
+                                acciones[NOQUIERO-JUGARCARTA][i-JUG1]=NO;
+                            }
+                            else
+                            {
+                                acciones[QUIERO-JUGARCARTA][i-JUG1]=SI;
+                                acciones[QUIEROVALECUATRO-JUGARCARTA][i-JUG1]=SI;
+                                acciones[NOQUIERO-JUGARCARTA][i-JUG1]=SI;
+                            }
+                        }
+                        else if(cantotruco==RETRUCOQUERIDO)
+                        {
+                            acciones[TRUCO-JUGARCARTA][i-JUG1]=NO;
+                            acciones[QUIERO-JUGARCARTA][i-JUG1]=NO;
+                            acciones[NOQUIERO-JUGARCARTA][i-JUG1]=NO;
+                            acciones[QUIERORETRUCO-JUGARCARTA][i-JUG1]=NO;
+                            if(eqcantotruco==i%2)
+                            {
+                                acciones[QUIEROVALECUATRO-JUGARCARTA][i-JUG1]=NO;
+                            }
+                            else
+                            {
+                                acciones[QUIEROVALECUATRO-JUGARCARTA][i-JUG1]=SI;
+                            }
+                        }
+                        else if(cantotruco==QUIEROVALECUATRO)
+                        {
+                            acciones[TRUCO-JUGARCARTA][i-JUG1]=NO;
+                            acciones[QUIERORETRUCO-JUGARCARTA][i-JUG1]=NO;
+                            acciones[QUIEROVALECUATRO-JUGARCARTA][i-JUG1]=NO;
+                            if(eqcantotruco==i%2)
+                            {
+                                acciones[QUIERO-JUGARCARTA][i-JUG1]=NO;
+                                acciones[NOQUIERO-JUGARCARTA][i-JUG1]=NO;
+                            }
+                            else
+                            {
+                                acciones[QUIERO-JUGARCARTA][i-JUG1]=SI;
+                                acciones[NOQUIERO-JUGARCARTA][i-JUG1]=SI;
+                            }
+                        }
+                        else if(cantotruco==VALECUATROQUERIDO)
+                        {
+                            acciones[TRUCO-JUGARCARTA][i-JUG1]=NO;
+                            acciones[QUIERO-JUGARCARTA][i-JUG1]=NO;
+                            acciones[NOQUIERO-JUGARCARTA][i-JUG1]=NO;
+                            acciones[QUIERORETRUCO-JUGARCARTA][i-JUG1]=NO;
+                            acciones[QUIEROVALECUATRO-JUGARCARTA][i-JUG1]=NO;
+                        }
                         //acciones[ALMAZO-JUGARCARTA][i-JUG1]=SI;
                         //acciones[CHATTODOS-JUGARCARTA][i-JUG1]=SI;
                         acciones[CONFLORMEACHICO-JUGARCARTA][i-JUG1]=NO;
                         acciones[CANTARTANTO-JUGARCARTA][i-JUG1]=NO;
+                    }
+                    if(sejuegaprimera==TERMINO)
+                    {
+                        sejuegasegunda=TERMINO;
+                        if(juega%2==EQ1%2)
+                        {
+                            bazaseq1=0;
+                            bazaseq2=3;
+                        }
+                        else
+                        {
+                            bazaseq1=3;
+                            bazaseq2=0;
+                        }
                     }
                     if(ultimoenjugarcarta!=NADIE)
                     {
@@ -1064,73 +1452,256 @@ int main (int argc,char **argv)
             case CANTARTANTO:
                 printf("Indicar tanto: ");
                 scanf("%d",&tanto);
-                if(cantoenvido!=CANTARTANTO)
+                if(cantoenvido!=NO)
                 {
-                    cantoenvido=CANTARTANTO;
-                }
-                if((char)tanto>maxtanto)
-                {
-                    maxtanto=(char)tanto;
-                    jugganaprimera=juega;
-                    if((char)tanto!=tantoenvido[juega])
+                    if(cantoenvido!=CANTARTANTO)
                     {
-                        malcanto=SI;
+                        cantoenvido=CANTARTANTO;
                     }
-                    else
+                    if((char)tanto>maxtanto)
                     {
-                        malcanto=NO;
-                    }
-                }
-                if(cantoflor!=CANTARTANTO)
-                {
-                    cantoflor=CANTARTANTO;
-                }
-                if((char)tanto>maxtanto)
-                {
-                    maxtanto=(char)tanto;
-                    jugganaprimera=juega;
-                    if((char)tanto!=tantoflor[juega])
-                    {
-                        malcanto=SI;
-                        if(juega%2==EQ1%2)
+                        maxtanto=(char)tanto;
+                        jugganaprimera=juega;
+                        if((char)tanto!=tantoenvido[juega])
                         {
-                            if(penalizacionflor[juega]==NO)
-                            {
-                                penalizacionflor[juega]=SI;
-                                floresnegadaseq1++;
-                            }
+                            malcanto=SI;
                         }
                         else
                         {
-                            if(penalizacionflor[juega]==NO)
-                            {
-                                penalizacionflor[juega]=SI;
-                                floresnegadaseq2++;
-                            }
+                            malcanto=NO;
                         }
+                    }
+                }
+                else if(cantoflor!=NO)
+                {
+                    if(cantoflor!=CANTARTANTO)
+                    {
+                        cantoflor=CANTARTANTO;
+                    }
+                    if((char)tanto>maxtanto)
+                    {
+                        maxtanto=(char)tanto;
+                        jugganaprimera=juega;
+                        if((char)tanto!=tantoflor[juega])
+                        {
+                            malcanto=SI;
+                            if(juega%2==EQ1%2)
+                            {
+                                if(penalizacionflor[juega]==NO)
+                                {
+                                    penalizacionflor[juega]=SI;
+                                    floresnegadaseq1++;
+                                }
+                            }
+                            else
+                            {
+                                if(penalizacionflor[juega]==NO)
+                                {
+                                    penalizacionflor[juega]=SI;
+                                    floresnegadaseq2++;
+                                }
+                            }
                     }
                     else
                     {
                         malcanto=NO;
                     }
                 }
+                }
                 //acciones[CANTARTANTO-JUGARCARTA][i-JUG1]=NO;
                 acciones[CANTARTANTO-JUGARCARTA][juega]=NO;
+                senal=0;
                 for(i=JUG1;i<JUG1+2*jugadoresporequipo;i++)//Este for puede ir en una función
                 {
                     //acciones[JUGARCARTA-JUGARCARTA][i-JUG1]=NO;
                     //acciones[TRUCO-JUGARCARTA][i-JUG1]=NO;
                     acciones[NADA-JUGARCARTA][i-JUG1]=SI;
-                    if(juega%2!=i%2)
+                    if(juega%2!=i%2 && acciones[CANTARTANTO-JUGARCARTA][i-JUG1]==SI)
+                    //if(juega%2!=i%2)
                     {
                         acciones[NOQUIERO-JUGARCARTA][i-JUG1]=SI;
+                        senal=1;
                     }
                 }
+                if(senal==0)
+                {
+                    if(cantoenvido==CANTARTANTO)
+                    {
+                        cantoenvido=TERMINO;
+                        if(malcanto==NO)
+                        {
+                            if(jugganaprimera%2==EQ1%2)
+                            {
+                                eqganaprimera=EQ1;
+                            }
+                            else
+                            {
+                                eqganaprimera=EQ2;
+                            }
+                        }
+                        else
+                        {
+                            if(jugganaprimera%2==EQ1%2)
+                            {
+                                eqganaprimera=EQ2;
+                            }
+                            else
+                            {
+                                eqganaprimera=EQ1;
+                            }
+                            if(puntosprimera<4)
+                            {
+                                puntosprimera=4;
+                            }
+                        }
+                    }
+                    if(cantoflor==CANTARTANTO)
+                    {
+                        cantoflor=TERMINO;
+                        if(jugganaprimera%2==EQ1%2)
+                        {
+                            eqganaprimera=EQ1;
+                        }
+                        else
+                        {
+                            eqganaprimera=EQ2;
+                        }
+                        if(malcanto==SI)
+                        {
+                            eqganaprimera=NADIE;
+                        }
+                    }
+                }
+                /*for(i=JUG1;i<JUG1+2*jugadoresporequipo;i++)//Este for puede ir en una función
+                {
+                    if(acciones[CANTARTANTO-JUGARCARTA][i-JUG1]==SI && juega%2!=i%2)
+                    {
+                        //acciones[NOQUIERO-JUGARCARTA][i-JUG1]=SI;
+                        senal=1;
+                        printf("En el if\n");
+                    }
+                }
+                if(senal==0)
+                {
+                    if(cantoenvido!=NO)
+                    {
+                        printf("Entró acá\n");
+                        cantoenvido=TERMINO;
+                    }
+                    else if(cantoflor!=NO)
+                    {
+                        printf("Entró acá\n");
+                        cantoflor=TERMINO;
+                    }
+                }*/
+                /*if(senal==0)
+                {
+                    for(i=JUG1;i<JUG1+2*jugadoresporequipo;i++)
+                    {
+                        if(cantotruco==NO)
+                        {
+                            acciones[TRUCO-JUGARCARTA][i-JUG1]=SI;
+                            acciones[QUIERO-JUGARCARTA][i-JUG1]=NO;
+                            acciones[NOQUIERO-JUGARCARTA][i-JUG1]=NO;
+                            acciones[QUIERORETRUCO-JUGARCARTA][i-JUG1]=NO;
+                            acciones[QUIEROVALECUATRO-JUGARCARTA][i-JUG1]=NO;
+                        }
+                        else if(cantotruco==TRUCO)
+                        {
+                            acciones[TRUCO-JUGARCARTA][i-JUG1]=NO;
+                            acciones[QUIEROVALECUATRO-JUGARCARTA][i-JUG1]=NO;
+                            if(eqcantotruco==i%2)
+                            {
+                                acciones[QUIERO-JUGARCARTA][i-JUG1]=NO;
+                                acciones[QUIERORETRUCO-JUGARCARTA][i-JUG1]=NO;
+                                acciones[NOQUIERO-JUGARCARTA][i-JUG1]=NO;
+                            }
+                            else
+                            {
+                                acciones[QUIERO-JUGARCARTA][i-JUG1]=SI;
+                                acciones[QUIERORETRUCO-JUGARCARTA][i-JUG1]=SI;
+                                acciones[NOQUIERO-JUGARCARTA][i-JUG1]=SI;
+                            }
+                        }
+                        else if(cantotruco==TRUCOQUERIDO)
+                        {
+                            acciones[TRUCO-JUGARCARTA][i-JUG1]=NO;
+                            acciones[QUIERO-JUGARCARTA][i-JUG1]=NO;
+                            acciones[NOQUIERO-JUGARCARTA][i-JUG1]=NO;
+                            acciones[QUIEROVALECUATRO-JUGARCARTA][i-JUG1]=NO;
+                            if(eqcantotruco==i%2)
+                            {
+                                acciones[QUIERORETRUCO-JUGARCARTA][i-JUG1]=NO;
+                            }
+                            else
+                            {
+                                acciones[QUIERORETRUCO-JUGARCARTA][i-JUG1]=SI;
+                            }
+                        }
+                        else if(cantotruco==QUIERORETRUCO)
+                        {
+                            acciones[TRUCO-JUGARCARTA][i-JUG1]=NO;
+                            acciones[QUIERORETRUCO-JUGARCARTA][i-JUG1]=NO;
+                            if(eqcantotruco==i%2)
+                            {
+                                acciones[QUIERO-JUGARCARTA][i-JUG1]=NO;
+                                acciones[QUIEROVALECUATRO-JUGARCARTA][i-JUG1]=NO;
+                                acciones[NOQUIERO-JUGARCARTA][i-JUG1]=NO;
+                            }
+                            else
+                            {
+                                acciones[QUIERO-JUGARCARTA][i-JUG1]=SI;
+                                acciones[QUIEROVALECUATRO-JUGARCARTA][i-JUG1]=SI;
+                                acciones[NOQUIERO-JUGARCARTA][i-JUG1]=SI;
+                            }
+                        }
+                        else if(cantotruco==RETRUCOQUERIDO)
+                        {
+                            acciones[TRUCO-JUGARCARTA][i-JUG1]=NO;
+                            acciones[QUIERO-JUGARCARTA][i-JUG1]=NO;
+                            acciones[NOQUIERO-JUGARCARTA][i-JUG1]=NO;
+                            acciones[QUIERORETRUCO-JUGARCARTA][i-JUG1]=NO;
+                            if(eqcantotruco==i%2)
+                            {
+                                acciones[QUIEROVALECUATRO-JUGARCARTA][i-JUG1]=NO;
+                            }
+                            else
+                            {
+                                acciones[QUIEROVALECUATRO-JUGARCARTA][i-JUG1]=SI;
+                            }
+                        }
+                        else if(cantotruco==QUIEROVALECUATRO)
+                        {
+                            acciones[TRUCO-JUGARCARTA][i-JUG1]=NO;
+                            acciones[QUIERORETRUCO-JUGARCARTA][i-JUG1]=NO;
+                            acciones[QUIEROVALECUATRO-JUGARCARTA][i-JUG1]=NO;
+                            if(eqcantotruco==i%2)
+                            {
+                                acciones[QUIERO-JUGARCARTA][i-JUG1]=NO;
+                                acciones[NOQUIERO-JUGARCARTA][i-JUG1]=NO;
+                            }
+                            else
+                            {
+                                acciones[QUIERO-JUGARCARTA][i-JUG1]=SI;
+                                acciones[NOQUIERO-JUGARCARTA][i-JUG1]=SI;
+                            }
+                        }
+                        else if(cantotruco==VALECUATROQUERIDO)
+                        {
+                            acciones[TRUCO-JUGARCARTA][i-JUG1]=NO;
+                            acciones[QUIERO-JUGARCARTA][i-JUG1]=NO;
+                            acciones[NOQUIERO-JUGARCARTA][i-JUG1]=NO;
+                            acciones[QUIERORETRUCO-JUGARCARTA][i-JUG1]=NO;
+                            acciones[QUIEROVALECUATRO-JUGARCARTA][i-JUG1]=NO;
+                        }
+                    }
+                }*/
                 juega++;
                 juega%=2*jugadoresporequipo;
                 break;
             case QUIERORETRUCO:
                 printf("%d canta quiero retruco\n",juega+1);
+                eqcantotruco=juega%2;
                 if(cantotruco==TRUCO)
                 {
                     puntossegunda++;
@@ -1158,6 +1729,7 @@ int main (int argc,char **argv)
                 break;
             case QUIEROVALECUATRO:
                 printf("%d canta quiero vale cuatro\n",juega+1);
+                eqcantotruco=juega%2;
                 if(cantotruco==QUIERORETRUCO)
                 {
                     puntossegunda++;
@@ -1245,7 +1817,7 @@ int main (int argc,char **argv)
                 if(hayflor==SI)
                 {
                     acciones[FLOR-JUGARCARTA][juega]=NO;
-                    if(tantoflor[juega]!=-1)
+                    if(tantoflor[juega]!=-1 && cantobienflor[juega]==NO)
                     {
                         if(juega%2==EQ1%2)
                         {
@@ -1275,6 +1847,216 @@ int main (int argc,char **argv)
                 break;
             default:
                 break;
+        }
+        if(cantoenvido==TERMINO)
+        {
+            cantoenvido=NO;
+            sejuegaprimera=TERMINO;
+            for(i=JUG1;i<JUG1+2*jugadoresporequipo;i++)
+            {
+                acciones[ALMAZO-JUGARCARTA][i-JUG1]=SI;
+                if(cantotruco==NO)
+                {
+                    acciones[TRUCO-JUGARCARTA][i-JUG1]=SI;
+                    acciones[QUIERO-JUGARCARTA][i-JUG1]=NO;
+                    acciones[NOQUIERO-JUGARCARTA][i-JUG1]=NO;
+                    acciones[QUIERORETRUCO-JUGARCARTA][i-JUG1]=NO;
+                    acciones[QUIEROVALECUATRO-JUGARCARTA][i-JUG1]=NO;
+                }
+                else if(cantotruco==TRUCO)
+                {
+                    acciones[TRUCO-JUGARCARTA][i-JUG1]=NO;
+                    acciones[QUIEROVALECUATRO-JUGARCARTA][i-JUG1]=NO;
+                    if(eqcantotruco==i%2)
+                    {
+                        acciones[QUIERO-JUGARCARTA][i-JUG1]=NO;
+                        acciones[QUIERORETRUCO-JUGARCARTA][i-JUG1]=NO;
+                        acciones[NOQUIERO-JUGARCARTA][i-JUG1]=NO;
+                    }
+                    else
+                    {
+                        acciones[QUIERO-JUGARCARTA][i-JUG1]=SI;
+                        acciones[QUIERORETRUCO-JUGARCARTA][i-JUG1]=SI;
+                        acciones[NOQUIERO-JUGARCARTA][i-JUG1]=SI;
+                    }
+                }
+                else if(cantotruco==TRUCOQUERIDO)
+                {
+                    acciones[TRUCO-JUGARCARTA][i-JUG1]=NO;
+                    acciones[QUIERO-JUGARCARTA][i-JUG1]=NO;
+                    acciones[NOQUIERO-JUGARCARTA][i-JUG1]=NO;
+                    acciones[QUIEROVALECUATRO-JUGARCARTA][i-JUG1]=NO;
+                    if(eqcantotruco==i%2)
+                    {
+                        acciones[QUIERORETRUCO-JUGARCARTA][i-JUG1]=NO;
+                    }
+                    else
+                    {
+                        acciones[QUIERORETRUCO-JUGARCARTA][i-JUG1]=SI;
+                    }
+                }
+                else if(cantotruco==QUIERORETRUCO)
+                {
+                    acciones[TRUCO-JUGARCARTA][i-JUG1]=NO;
+                    acciones[QUIERORETRUCO-JUGARCARTA][i-JUG1]=NO;
+                    if(eqcantotruco==i%2)
+                    {
+                        acciones[QUIERO-JUGARCARTA][i-JUG1]=NO;
+                        acciones[QUIEROVALECUATRO-JUGARCARTA][i-JUG1]=NO;
+                        acciones[NOQUIERO-JUGARCARTA][i-JUG1]=NO;
+                    }
+                    else
+                    {
+                        acciones[QUIERO-JUGARCARTA][i-JUG1]=SI;
+                        acciones[QUIEROVALECUATRO-JUGARCARTA][i-JUG1]=SI;
+                        acciones[NOQUIERO-JUGARCARTA][i-JUG1]=SI;
+                    }
+                }
+                else if(cantotruco==RETRUCOQUERIDO)
+                {
+                    acciones[TRUCO-JUGARCARTA][i-JUG1]=NO;
+                    acciones[QUIERO-JUGARCARTA][i-JUG1]=NO;
+                    acciones[NOQUIERO-JUGARCARTA][i-JUG1]=NO;
+                    acciones[QUIERORETRUCO-JUGARCARTA][i-JUG1]=NO;
+                    if(eqcantotruco==i%2)
+                    {
+                        acciones[QUIEROVALECUATRO-JUGARCARTA][i-JUG1]=NO;
+                    }
+                    else
+                    {
+                        acciones[QUIEROVALECUATRO-JUGARCARTA][i-JUG1]=SI;
+                    }
+                }
+                else if(cantotruco==QUIEROVALECUATRO)
+                {
+                    acciones[TRUCO-JUGARCARTA][i-JUG1]=NO;
+                    acciones[QUIERORETRUCO-JUGARCARTA][i-JUG1]=NO;
+                    acciones[QUIEROVALECUATRO-JUGARCARTA][i-JUG1]=NO;
+                    if(eqcantotruco==i%2)
+                    {
+                        acciones[QUIERO-JUGARCARTA][i-JUG1]=NO;
+                        acciones[NOQUIERO-JUGARCARTA][i-JUG1]=NO;
+                    }
+                    else
+                    {
+                        acciones[QUIERO-JUGARCARTA][i-JUG1]=SI;
+                        acciones[NOQUIERO-JUGARCARTA][i-JUG1]=SI;
+                    }
+                }
+                else if(cantotruco==VALECUATROQUERIDO)
+                {
+                    acciones[TRUCO-JUGARCARTA][i-JUG1]=NO;
+                    acciones[QUIERO-JUGARCARTA][i-JUG1]=NO;
+                    acciones[NOQUIERO-JUGARCARTA][i-JUG1]=NO;
+                    acciones[QUIERORETRUCO-JUGARCARTA][i-JUG1]=NO;
+                    acciones[QUIEROVALECUATRO-JUGARCARTA][i-JUG1]=NO;
+                }
+            }
+        }
+        else if(cantoflor==TERMINO)
+        {
+            cantoflor=NO;
+            sejuegaprimera=TERMINO;
+            for(i=JUG1;i<JUG1+2*jugadoresporequipo;i++)
+            {
+                acciones[ALMAZO-JUGARCARTA][i-JUG1]=SI;
+                if(cantotruco==NO)
+                {
+                    acciones[TRUCO-JUGARCARTA][i-JUG1]=SI;
+                    acciones[QUIERO-JUGARCARTA][i-JUG1]=NO;
+                    acciones[NOQUIERO-JUGARCARTA][i-JUG1]=NO;
+                    acciones[QUIERORETRUCO-JUGARCARTA][i-JUG1]=NO;
+                    acciones[QUIEROVALECUATRO-JUGARCARTA][i-JUG1]=NO;
+                }
+                else if(cantotruco==TRUCO)
+                {
+                    acciones[TRUCO-JUGARCARTA][i-JUG1]=NO;
+                    acciones[QUIEROVALECUATRO-JUGARCARTA][i-JUG1]=NO;
+                    if(eqcantotruco==i%2)
+                    {
+                        acciones[QUIERO-JUGARCARTA][i-JUG1]=NO;
+                        acciones[QUIERORETRUCO-JUGARCARTA][i-JUG1]=NO;
+                        acciones[NOQUIERO-JUGARCARTA][i-JUG1]=NO;
+                    }
+                    else
+                    {
+                        acciones[QUIERO-JUGARCARTA][i-JUG1]=SI;
+                        acciones[QUIERORETRUCO-JUGARCARTA][i-JUG1]=SI;
+                        acciones[NOQUIERO-JUGARCARTA][i-JUG1]=SI;
+                    }
+                }
+                else if(cantotruco==TRUCOQUERIDO)
+                {
+                    acciones[TRUCO-JUGARCARTA][i-JUG1]=NO;
+                    acciones[QUIERO-JUGARCARTA][i-JUG1]=NO;
+                    acciones[NOQUIERO-JUGARCARTA][i-JUG1]=NO;
+                    acciones[QUIEROVALECUATRO-JUGARCARTA][i-JUG1]=NO;
+                    if(eqcantotruco==i%2)
+                    {
+                        acciones[QUIERORETRUCO-JUGARCARTA][i-JUG1]=NO;
+                    }
+                    else
+                    {
+                        acciones[QUIERORETRUCO-JUGARCARTA][i-JUG1]=SI;
+                    }
+                }
+                else if(cantotruco==QUIERORETRUCO)
+                {
+                    acciones[TRUCO-JUGARCARTA][i-JUG1]=NO;
+                    acciones[QUIERORETRUCO-JUGARCARTA][i-JUG1]=NO;
+                    if(eqcantotruco==i%2)
+                    {
+                        acciones[QUIERO-JUGARCARTA][i-JUG1]=NO;
+                        acciones[QUIEROVALECUATRO-JUGARCARTA][i-JUG1]=NO;
+                        acciones[NOQUIERO-JUGARCARTA][i-JUG1]=NO;
+                    }
+                    else
+                    {
+                        acciones[QUIERO-JUGARCARTA][i-JUG1]=SI;
+                        acciones[QUIEROVALECUATRO-JUGARCARTA][i-JUG1]=SI;
+                        acciones[NOQUIERO-JUGARCARTA][i-JUG1]=SI;
+                    }
+                }
+                else if(cantotruco==RETRUCOQUERIDO)
+                {
+                    acciones[TRUCO-JUGARCARTA][i-JUG1]=NO;
+                    acciones[QUIERO-JUGARCARTA][i-JUG1]=NO;
+                    acciones[NOQUIERO-JUGARCARTA][i-JUG1]=NO;
+                    acciones[QUIERORETRUCO-JUGARCARTA][i-JUG1]=NO;
+                    if(eqcantotruco==i%2)
+                    {
+                        acciones[QUIEROVALECUATRO-JUGARCARTA][i-JUG1]=NO;
+                    }
+                    else
+                    {
+                        acciones[QUIEROVALECUATRO-JUGARCARTA][i-JUG1]=SI;
+                    }
+                }
+                else if(cantotruco==QUIEROVALECUATRO)
+                {
+                    acciones[TRUCO-JUGARCARTA][i-JUG1]=NO;
+                    acciones[QUIERORETRUCO-JUGARCARTA][i-JUG1]=NO;
+                    acciones[QUIEROVALECUATRO-JUGARCARTA][i-JUG1]=NO;
+                    if(eqcantotruco==i%2)
+                    {
+                        acciones[QUIERO-JUGARCARTA][i-JUG1]=NO;
+                        acciones[NOQUIERO-JUGARCARTA][i-JUG1]=NO;
+                    }
+                    else
+                    {
+                        acciones[QUIERO-JUGARCARTA][i-JUG1]=SI;
+                        acciones[NOQUIERO-JUGARCARTA][i-JUG1]=SI;
+                    }
+                }
+                else if(cantotruco==VALECUATROQUERIDO)
+                {
+                    acciones[TRUCO-JUGARCARTA][i-JUG1]=NO;
+                    acciones[QUIERO-JUGARCARTA][i-JUG1]=NO;
+                    acciones[NOQUIERO-JUGARCARTA][i-JUG1]=NO;
+                    acciones[QUIERORETRUCO-JUGARCARTA][i-JUG1]=NO;
+                    acciones[QUIEROVALECUATRO-JUGARCARTA][i-JUG1]=NO;
+                }
+            }
         }
         if(sejuegasegunda==SI)
         {
@@ -1385,16 +2167,19 @@ int main (int argc,char **argv)
         eqganasegunda=EQ1;
     else
         eqganasegunda=EQ2;
-    if(ultimoenjugarcarta==NADIE)
+    if(ultimoenjugarcarta==NADIE && eqganaprimera==NADIE)
     {
-        puntosprimera=1;
-        if(mano%2==EQ1%2)
+        if(cantoflor==NO)
         {
-            eqganaprimera=EQ2;
-        }
-        else
-        {
-            eqganaprimera=EQ1;
+            puntosprimera=1;
+            if(mano%2==EQ1%2)
+            {
+                eqganaprimera=EQ2;
+            }
+            else
+            {
+                eqganaprimera=EQ1;
+            }
         }
     }
     if(eqganaprimera==EQ1)//Puede hacerse una función que calcule el ganador de la "primera"
