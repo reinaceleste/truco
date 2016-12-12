@@ -3,8 +3,8 @@
 *  \file prototipos.h
 *  \brief Contiene los prototipos de las funciones, las constantes simbólicas, typedefs y estructuras utilizadas en el TP
 * \author Federico Ariel Marinzalda
-* \version 1.1
-* \date 1/12/2016
+* \version 1.2
+* \date 12/12/2016
 *
 *
 *******************************************************/
@@ -17,7 +17,16 @@ void configurarcartas (baraja_t(*)[10]);
 void calcularvalorescartas (baraja_t(*)[10],unsigned char(*)[10],unsigned char(*)[10]);
 void repartircartas (baraja_t(*)[10],baraja_t(*)[3],unsigned char,unsigned char);
 void calculotanto (baraja_t(*)[10],baraja_t(*)[3],unsigned char(*)[10],char*,char*,unsigned char,unsigned char);
+void inicializaracciones (unsigned char(*)[6],unsigned char,unsigned char);
+void inicializarmano (char*,char*,char*,char*,char*,char*,unsigned char*,unsigned char(*)[3],unsigned char);
+void informarcartas(unsigned char,unsigned char(*)[3],unsigned char,unsigned char,char*,char*);
+void juegamano (baraja_t(*)[10],baraja_t(*)[3],unsigned char(*)[6],unsigned char,char*,char*,char*,char*,char*,char*,unsigned char*,unsigned char(*)[3],unsigned char(*)[10],unsigned char,unsigned char,unsigned char,unsigned char*,unsigned char*,unsigned char*,unsigned char*,unsigned char*,unsigned char*,unsigned char,unsigned char);
+void informarmano (unsigned char,unsigned char,unsigned char,unsigned char,unsigned char,unsigned char,unsigned char*,unsigned char*);
+void informarpicapica (unsigned char,unsigned char,unsigned char*,unsigned char*);
 int myStrlen (const char*);
+int myStrncpy (char* dest,char* origen,int n);
+int myStrnlastcpy (char* dest,char* origen,int n);
+int myStrcencpy (char* dest,char* origen,int n,int m);
 
 //Constantes simbólicas usadas en el TP
 #define BASTO 2
