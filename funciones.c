@@ -3,8 +3,8 @@
 *  \file funciones.c
 *  \brief Contiene las funciones utilizadas en el TP
 * \author Federico Ariel Marinzalda
-* \version 1.2
-* \date 12/12/2016
+* \version 1.3
+* \date 17/12/2016
 *
 *
 *******************************************************/
@@ -406,7 +406,10 @@ void inicializaracciones (unsigned char(*acciones)[6],unsigned char jugadorespor
     }
     if(hayflor==NO)
     {
-        acciones[FLOR-JUGARCARTA][i-JUG1]=NO;
+        for(i=JUG1;i<=JUG6;i++)
+        {
+            acciones[FLOR-JUGARCARTA][i-JUG1]=NO;
+        }
     }
     if(jugadoresporequipo<3)
     {
@@ -516,8 +519,8 @@ void informarcartas(unsigned char mostrarcartas,unsigned char(*cartasrepartidas)
 *  \fn void juegamano (baraja_t(*cartas)[10],baraja_t(*cartasrepartidas)[3],unsigned char(*acciones)[6],unsigned char mano,char *tantoenvido,char *tantoflor,char *penalizacionflor,char *cantobienflor,char *cartasjugadastruco,char *jugcantoenvido,unsigned char *mazo,unsigned char(*ordencartasjugadas)[3],unsigned char(*valorcartaparasegunda)[10],unsigned char jugadoresporequipo,unsigned char hayflor,unsigned char estilo,unsigned char *eqganaprimera,unsigned char *eqganasegunda,unsigned char *floresnegadaseq1,unsigned char *floresnegadaseq2,unsigned char *puntosprimera,unsigned char *puntossegunda,unsigned char puntoseq1,unsigned char puntoseq2)
 *  \brief Función que inicializa la mano a jugar
 * \author Federico Ariel Marinzalda
-* \version 1.0
-* \date 12/12/2016
+* \version 1.1
+* \date 17/12/2016
 * \param [in] **cartas Puntero a puntero a baraja_t que contiene la dirección de comienzo de la matriz de cartas
 * \param [in] **cartasrepartidas Puntero a puntero a baraja_t que contiene la dirección de comienzo de la matriz con los códigos de las cartas repartidas para los jugadores
 * \param [in] **acciones Puntero a puntero a unsigned char que contiene la dirección de comienzo de la matriz de acciones posibles para cada jugador
@@ -576,7 +579,7 @@ void juegamano (baraja_t(*cartas)[10],baraja_t(*cartasrepartidas)[3],unsigned ch
     {
         baza[i]=PARDA;
     }
-    while(enmazo<2*jugadoresporequipo)//Hacer función de juego
+    while(enmazo<2*jugadoresporequipo)
     {
         printf("Opciones para jugador %d:\n",juega+1);
         for(n=JUGARCARTA;n<=NADA;n++)
@@ -775,8 +778,16 @@ void juegamano (baraja_t(*cartas)[10],baraja_t(*cartasrepartidas)[3],unsigned ch
                 {
                     sejuegaprimera=TERMINO;
                 }
-                juega++;
-                juega%=2*jugadoresporequipo;
+                if(estilo==REDONDA)
+                {
+                    juega++;
+                    juega%=2*jugadoresporequipo;
+                }
+                else
+                {
+                    juega+=3;
+                    juega%=6;
+                }
                 break;
             case ENVIDO:
                 printf("%d canta envido\n",juega+1);
@@ -792,6 +803,10 @@ void juegamano (baraja_t(*cartas)[10],baraja_t(*cartasrepartidas)[3],unsigned ch
                     *puntosprimera=1;
                     for(i=JUG1;i<JUG1+2*jugadoresporequipo;i++)
                     {
+                        if(juega!=i-JUG1)
+                        {
+                            acciones[JUGARCARTA-JUGARCARTA][i-JUG1]=NO;
+                        }
                         acciones[ALMAZO-JUGARCARTA][i-JUG1]=NO;
                         acciones[NADA-JUGARCARTA][i-JUG1]=SI;
                         if(juega%2==i%2)
@@ -821,6 +836,7 @@ void juegamano (baraja_t(*cartas)[10],baraja_t(*cartasrepartidas)[3],unsigned ch
                     *puntosprimera=2;
                     for(i=JUG1;i<JUG1+2*jugadoresporequipo;i++)
                     {
+                        acciones[JUGARCARTA-JUGARCARTA][i-JUG1]=NO;
                         acciones[ALMAZO-JUGARCARTA][i-JUG1]=NO;
                         acciones[NADA-JUGARCARTA][i-JUG1]=SI;
                         if(juega%2==i%2)
@@ -871,6 +887,18 @@ void juegamano (baraja_t(*cartas)[10],baraja_t(*cartasrepartidas)[3],unsigned ch
                 }
                 for(i=JUG1;i<JUG1+2*jugadoresporequipo;i++)
                 {
+                    if(juega!=i-JUG1)
+                    {
+                        acciones[JUGARCARTA-JUGARCARTA][i-JUG1]=NO;
+                    }
+                    else if(cantoenvido!=NO)
+                    {
+                        acciones[JUGARCARTA-JUGARCARTA][i-JUG1]=NO;
+                    }
+                    else
+                    {
+                        acciones[JUGARCARTA-JUGARCARTA][i-JUG1]=SI;
+                    }
                     acciones[ALMAZO-JUGARCARTA][i-JUG1]=NO;
                     acciones[NADA-JUGARCARTA][i-JUG1]=SI;
                     if(juega%2==i%2)
@@ -929,6 +957,18 @@ void juegamano (baraja_t(*cartas)[10],baraja_t(*cartasrepartidas)[3],unsigned ch
                 }
                 for(i=JUG1;i<JUG1+2*jugadoresporequipo;i++)
                 {
+                    if(juega!=i-JUG1)
+                    {
+                        acciones[JUGARCARTA-JUGARCARTA][i-JUG1]=NO;
+                    }
+                    else if(cantoenvido!=NO)
+                    {
+                        acciones[JUGARCARTA-JUGARCARTA][i-JUG1]=NO;
+                    }
+                    else
+                    {
+                        acciones[JUGARCARTA-JUGARCARTA][i-JUG1]=SI;
+                    }
                     acciones[ALMAZO-JUGARCARTA][i-JUG1]=NO;
                     acciones[NADA-JUGARCARTA][i-JUG1]=SI;
                     if(juega%2==i%2)
@@ -1005,7 +1045,10 @@ void juegamano (baraja_t(*cartas)[10],baraja_t(*cartasrepartidas)[3],unsigned ch
                 acciones[FLOR-JUGARCARTA][juega]=NO;
                 for(i=JUG1;i<JUG1+2*jugadoresporequipo;i++)
                 {
-                    acciones[JUGARCARTA-JUGARCARTA][i-JUG1]=NO;
+                    if(juega!=i-JUG1)
+                    {
+                        acciones[JUGARCARTA-JUGARCARTA][i-JUG1]=NO;
+                    }
                     acciones[ENVIDO-JUGARCARTA][i-JUG1]=NO;
                     acciones[REALENVIDO-JUGARCARTA][i-JUG1]=NO;
                     acciones[FALTAENVIDO-JUGARCARTA][i-JUG1]=NO;
@@ -1050,6 +1093,19 @@ void juegamano (baraja_t(*cartas)[10],baraja_t(*cartasrepartidas)[3],unsigned ch
                     else
                     {
                         equltimaflor=EQ2;
+                    }
+                }
+                if(cantotruco!=NO)
+                {
+                    if(estilo==REDONDA)
+                    {
+                        juega++;
+                        juega%=2*jugadoresporequipo;
+                    }
+                    else
+                    {
+                        juega+=3;
+                        juega%=6;
                     }
                 }
                 break;
@@ -1103,6 +1159,19 @@ void juegamano (baraja_t(*cartas)[10],baraja_t(*cartasrepartidas)[3],unsigned ch
                         equltimaflor=EQ2;
                     }
                 }
+                if(cantotruco!=NO)
+                {
+                    if(estilo==REDONDA)
+                    {
+                        juega++;
+                        juega%=2*jugadoresporequipo;
+                    }
+                    else
+                    {
+                        juega+=3;
+                        juega%=6;
+                    }
+                }
                 break;
             case CONTRAFLORALRESTO:
                 cantoflor=CONTRAFLORALRESTO;
@@ -1154,13 +1223,26 @@ void juegamano (baraja_t(*cartas)[10],baraja_t(*cartasrepartidas)[3],unsigned ch
                         equltimaflor=EQ2;
                     }
                 }
+                if(cantotruco!=NO)
+                {
+                    if(estilo==REDONDA)
+                    {
+                        juega++;
+                        juega%=2*jugadoresporequipo;
+                    }
+                    else
+                    {
+                        juega+=3;
+                        juega%=6;
+                    }
+                }
                 break;
             case TRUCO:
                 printf("%d canta truco\n",juega+1);
                 sejuegasegunda=SI;
                 cantotruco=TRUCO;
                 eqcantotruco=juega%2;
-                for(i=JUG1;i<JUG1+2*jugadoresporequipo;i++)//Este for puede ir en una función
+                for(i=JUG1;i<JUG1+2*jugadoresporequipo;i++)
                 {
                     acciones[JUGARCARTA-JUGARCARTA][i-JUG1]=NO;
                     acciones[TRUCO-JUGARCARTA][i-JUG1]=NO;
@@ -1274,8 +1356,10 @@ void juegamano (baraja_t(*cartas)[10],baraja_t(*cartasrepartidas)[3],unsigned ch
                             *puntosprimera=*puntosprimera+30-puntoseq2;
                         }
                     }
+                    juega=mano-JUG1;
+                    break;
                 }
-                else if(cantotruco==TRUCO)//Esto puede ir en una función
+                else if(cantotruco==TRUCO)
                 {
                     for(i=JUG1;i<JUG1+2*jugadoresporequipo;i++)
                     {
@@ -1309,14 +1393,37 @@ void juegamano (baraja_t(*cartas)[10],baraja_t(*cartasrepartidas)[3],unsigned ch
                     }
                 }
                 (*puntossegunda)++;
-                if(ultimoenjugarcarta!=NADIE)
+                senal=0;
+                for(i=JUG1;i<JUG1+2*jugadoresporequipo;i++)
                 {
-                    juega=ultimoenjugarcarta+1;
-                    juega%=2*jugadoresporequipo;
+                    if(cartasjugadastruco[i-JUG1]!=-2)
+                    {
+                        senal=1;
+                    }
+                }
+                if(senal==1)
+                {
+                    if(estilo==REDONDA)
+                    {
+                        juega=ultimoenjugarcarta+1;
+                        juega%=2*jugadoresporequipo;
+                    }
+                    else
+                    {
+                        juega=ultimoenjugarcarta+3;
+                        juega%=6;
+                    }
                 }
                 else
                 {
-                    juega=mano-JUG1;
+                    if(bazasjugadas>0)
+                    {
+                        juega=ganabaza;
+                    }
+                    else
+                    {
+                        juega=mano-JUG1;
+                    }
                 }
                 break;
             case NOQUIERO:
@@ -1365,8 +1472,16 @@ void juegamano (baraja_t(*cartas)[10],baraja_t(*cartasrepartidas)[3],unsigned ch
                     }
                     if(ultimoenjugarcarta!=NADIE)
                     {
-                        juega=ultimoenjugarcarta+1;
-                        juega%=2*jugadoresporequipo;
+                        if(estilo==REDONDA)
+                        {
+                            juega=ultimoenjugarcarta+1;
+                            juega%=2*jugadoresporequipo;
+                        }
+                        else
+                        {
+                            juega=ultimoenjugarcarta+3;
+                            juega%=6;
+                        }
                     }
                     else
                     {
@@ -1412,12 +1527,37 @@ void juegamano (baraja_t(*cartas)[10],baraja_t(*cartasrepartidas)[3],unsigned ch
                             *puntosprimera=4;
                         }
                     }
+                    if(ultimoenjugarcarta!=NADIE)
+                    {
+                        if(estilo==REDONDA)
+                        {
+                            juega=ultimoenjugarcarta+1;
+                            juega%=2*jugadoresporequipo;
+                        }
+                        else
+                        {
+                            juega=ultimoenjugarcarta+3;
+                            juega%=6;
+                        }
+                    }
+                    else
+                    {
+                        juega=mano-JUG1;
+                    }
                     cantoflor=TERMINO;
                 }
                 if(sejuegasegunda==SI)
                 {
-                    i=juega+1;
-                    i%=2*jugadoresporequipo;
+                    if(estilo==REDONDA)
+                    {
+                        i=juega+1;
+                        i%=2*jugadoresporequipo;
+                    }
+                    else
+                    {
+                        i=juega+3;
+                        i%=6;
+                    }
                     while(i!=juega)
                     {
                         if(tantoflor[i]!=-1 && penalizacionflor[juega]==NO && cantobienflor[juega]==NO)
@@ -1432,8 +1572,16 @@ void juegamano (baraja_t(*cartas)[10],baraja_t(*cartasrepartidas)[3],unsigned ch
                                 (*floresnegadaseq2)++;
                             }
                         }
-                        i++;
-                        i%=2*jugadoresporequipo;
+                        if(estilo==REDONDA)
+                        {
+                            i++;
+                            i%=2*jugadoresporequipo;
+                        }
+                        else
+                        {
+                            i+=3;
+                            i%=6;
+                        }
                     }
                     if(sejuegaprimera==TERMINO)
                     {
@@ -1451,8 +1599,16 @@ void juegamano (baraja_t(*cartas)[10],baraja_t(*cartasrepartidas)[3],unsigned ch
                     }
                     if(ultimoenjugarcarta!=NADIE)
                     {
-                        juega=ultimoenjugarcarta+1;
-                        juega%=2*jugadoresporequipo;
+                        if(estilo==REDONDA)
+                        {
+                            juega=ultimoenjugarcarta+1;
+                            juega%=2*jugadoresporequipo;
+                        }
+                        else
+                        {
+                            juega=ultimoenjugarcarta+3;
+                            juega%=6;
+                        }
                     }
                     else
                     {
@@ -1550,7 +1706,7 @@ void juegamano (baraja_t(*cartas)[10],baraja_t(*cartasrepartidas)[3],unsigned ch
                 }
                 acciones[CANTARTANTO-JUGARCARTA][juega]=NO;
                 senal=0;
-                for(i=JUG1;i<JUG1+2*jugadoresporequipo;i++)//Este for puede ir en una función
+                for(i=JUG1;i<JUG1+2*jugadoresporequipo;i++)
                 {
                     acciones[NADA-JUGARCARTA][i-JUG1]=SI;
                     if(juega%2!=i%2 && acciones[CANTARTANTO-JUGARCARTA][i-JUG1]==SI)
@@ -1626,7 +1782,7 @@ void juegamano (baraja_t(*cartas)[10],baraja_t(*cartasrepartidas)[3],unsigned ch
                 {
                     (*puntossegunda)++;
                 }
-                for(i=JUG1;i<JUG1+2*jugadoresporequipo;i++)//Este for puede ir en una función
+                for(i=JUG1;i<JUG1+2*jugadoresporequipo;i++)
                 {
                     acciones[JUGARCARTA-JUGARCARTA][i-JUG1]=NO;
                     acciones[QUIERORETRUCO-JUGARCARTA][i-JUG1]=NO;
@@ -1662,7 +1818,7 @@ void juegamano (baraja_t(*cartas)[10],baraja_t(*cartasrepartidas)[3],unsigned ch
                 {
                     (*puntossegunda)++;
                 }
-                for(i=JUG1;i<JUG1+2*jugadoresporequipo;i++)//Este for puede ir en una función
+                for(i=JUG1;i<JUG1+2*jugadoresporequipo;i++)
                 {
                     acciones[JUGARCARTA-JUGARCARTA][i-JUG1]=NO;
                     acciones[QUIEROVALECUATRO-JUGARCARTA][i-JUG1]=NO;
@@ -1733,7 +1889,7 @@ void juegamano (baraja_t(*cartas)[10],baraja_t(*cartasrepartidas)[3],unsigned ch
                 break;
             case CHATTODOS:
                 printf("Mensaje: ");
-                scanf(" %[^\n]",mensaje);//Esto puede ir en una función
+                scanf(" %[^\n]",mensaje);
                 while(myStrlen(mensaje)>LARGOMSG)
                 {
                     printf("Mensaje muy largo. Acórtelo\n");
@@ -1745,7 +1901,7 @@ void juegamano (baraja_t(*cartas)[10],baraja_t(*cartasrepartidas)[3],unsigned ch
                 break;
             case CHATEQUIPO:
                 printf("Mensaje: ");
-                scanf(" %[^\n]",mensaje);//Esto puede ir en una función
+                scanf(" %[^\n]",mensaje);
                 while(myStrlen(mensaje)>LARGOMSG)
                 {
                     printf("Mensaje muy largo. Acórtelo\n");
@@ -1942,7 +2098,7 @@ void juegamano (baraja_t(*cartas)[10],baraja_t(*cartasrepartidas)[3],unsigned ch
             if(bazaterminada==SI)
             {
                 max=cartasjugadastruco[0];
-                ganabaza=JUG1;
+                ganabaza=0;
                 for(i=1;i<2*jugadoresporequipo;i++)
                 {
                     if(cartasjugadastruco[i]>max)
@@ -2024,7 +2180,7 @@ void juegamano (baraja_t(*cartas)[10],baraja_t(*cartasrepartidas)[3],unsigned ch
         {
             for(i=JUG1;i<JUG1+2*jugadoresporequipo;i++)
             {
-                if(mazo[i-JUG1]==NO && ordencartasjugadas[juega][0]*ordencartasjugadas[juega][1]*ordencartasjugadas[juega][2]==0)
+                if(mazo[i-JUG1]==NO && ordencartasjugadas[juega][0]*ordencartasjugadas[juega][1]*ordencartasjugadas[juega][2]==0 && (sejuegaprimera==NO || sejuegaprimera==TERMINO))
                 {
                     acciones[JUGARCARTA-JUGARCARTA][i-JUG1]=SI;
                 }
