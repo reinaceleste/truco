@@ -28,6 +28,8 @@
 #define MAX_IP 14
 #define MAX_CONEXIONES 10
 #define PATH_CONFIG "config.txt"
+#define MAX_USER 32
+#define MAX_PASS 24
 
 //-----------------
 //-- Estructuras --
@@ -36,6 +38,10 @@
 struct datos{  
      char ip[MAX_IP];
      int  puerto;
+};
+struct usuario{
+    char user[MAX_USER+1];
+    char password[MAX_PASS+1];
 };
      
 //-----------------

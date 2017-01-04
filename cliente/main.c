@@ -24,6 +24,7 @@ int main(void){
     char nombre[MAX_NOM];
     char respuesta[MAX_REP];
     char op='E';
+    struct usuario us;
      
     /*system("clear"); 
      
@@ -34,17 +35,18 @@ int main(void){
     printf("*****************************************************\n");*/
     
      
-	printf("Ingrese continuar o salir (minusculas) para cerrar la aplicacion: \r\n"); 
+	/*printf("Ingrese continuar o salir (minusculas) para cerrar la aplicacion: \r\n"); 
 	gets_s(nombre,MAX_NOM);
 	 
 	if(strcmp(nombre,"continuar")){
 		puts("\r\nCliente desconectado del servidor.\r\n");
 		return(0);
-	}
+	}*/
 	    
 	sockfd_cliente = login();
 
-	nBytes = recv(sockfd_cliente,&respuesta,sizeof(respuesta),0);   
+	//nBytes = recv(sockfd_cliente,&respuesta,sizeof(respuesta),0);
+        nBytes = recv(sockfd_cliente,respuesta,MAX_REP,0);
 	if(nBytes<=0){            									
 		puts("Error en recv\r\n");
                 close(sockfd_cliente);
@@ -56,14 +58,51 @@ int main(void){
                     printf("Respuesta del servidor: %s\r\n",respuesta);
                     scanf(" %c",&op);
                     send(sockfd_cliente, &op, sizeof(op), 0);
-                    nBytes = recv(sockfd_cliente,&respuesta,sizeof(respuesta),0);
+                    //nBytes = recv(sockfd_cliente,&respuesta,sizeof(respuesta),0);
+                    nBytes = recv(sockfd_cliente,respuesta,MAX_REP,0);
                     if(nBytes<=0){            									
                         puts("Error en recv\r\n");
                         close(sockfd_cliente);
                         return(-1);
                     }
+                    else{
+                        switch(op)
+                        {
+                            case 'R':
+                                /*nBytes = recv(sockfd_cliente,&respuesta,sizeof(respuesta),0);
+                                if(nBytes<=0){            									
+                                    puts("Error en recv\r\n");
+                                    close(sockfd_cliente);
+                                    return(-1);
+                                }*/
+                                printf("Respuesta del servidor: %s\r\n",respuesta);
+                                scanf("%s",us.user);
+                                send(sockfd_cliente, us.user, strlen(us.user)+1, 0);
+                                //nBytes = recv(sockfd_cliente,&respuesta,sizeof(respuesta),0);
+                                nBytes = recv(sockfd_cliente,respuesta,MAX_REP,0);
+                                //printf("nBytes = %d\n",nBytes);
+                                if(nBytes<=0){            									
+                                    puts("Error en recv\r\n");
+                                    close(sockfd_cliente);
+                                    return(-1);
+                                }
+                                printf("Respuesta del servidor: %s\r\n",respuesta);
+                                scanf("%s",us.password);
+                                send(sockfd_cliente, us.password, strlen(us.password)+1, 0);
+                                //nBytes = recv(sockfd_cliente,&respuesta,sizeof(respuesta),0);
+                                nBytes = recv(sockfd_cliente,respuesta,MAX_REP,0);
+                                if(nBytes<=0){            									
+                                    puts("Error en recv\r\n");
+                                    close(sockfd_cliente);
+                                    return(-1);
+                                }
+                                //TODO Tengo que comprobar que el servidor me pida ingresar contraseña, luego que me avise que sea válida para confirmarla y vverificar que el servidor aceptó la contraseña TODO
+                                printf("Respuesta del servidor: %s\r\n",respuesta);
+                        }
+                    }
                 }
-                recv(sockfd_cliente,&respuesta,sizeof(respuesta),0);
+                //recv(sockfd_cliente,&respuesta,sizeof(respuesta),0);
+                nBytes = recv(sockfd_cliente,respuesta,MAX_REP,0);
 		close(sockfd_cliente);
 		puts("Cliente desconectado del servidor.\r\n");
 	}
