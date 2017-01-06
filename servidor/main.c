@@ -122,10 +122,10 @@ int main(void){
 	    }*/
 	    
 	    //Exploro conexiones existentes en busca de datos que leer.
-	    if((listen(listener,MAX_CONEXIONES)) == -1){
+	    /*if((listen(listener,MAX_CONEXIONES)) == -1){
 		printf("Error en listen");
 		return(-1);
-    }
+    }*/
 		//for(i = 0; i <= fdmax; i++){
 		  
 		//	if(FD_ISSET(i,&readset)){
@@ -153,14 +153,9 @@ int main(void){
                                         {
                                             close(listener);
                                             strcpy(respuesta,"Conexion aceptada\n\nR: Registrarse\nI: Iniciar sesion\nT: Jugar TrucoC\nS: Cerrar sesion\n\n");
-                                            //send(cliente, &respuesta, sizeof(respuesta), 0);
                                             send(cliente, respuesta, strlen(respuesta)+1, 0);
                                             while(op!='S')
                                             {
-                                                //strcat(respuesta,"\n\nR: Registrarse\nI: Iniciar sesion\nT: Jugar TrucoC\nS: Cerrar sesion\n\n");
-                                                //strcpy(respuesta,"\n\nR: Registrarse\nI: Iniciar sesion\nT: Jugar TrucoC\nS: Cerrar sesion\n\n");
-                                                //send(cliente, &respuesta, sizeof(respuesta), 0);
-                                                //send(cliente, respuesta, strlen(respuesta)+1, 0);
                                                 nBytes = recv(cliente,&op,sizeof(op),0);   
                                                 if(nBytes<=0){            									
                                                     puts("Error en recv\r\n");
@@ -172,11 +167,7 @@ int main(void){
                                                     switch(op)
                                                     {
                                                         case 'R':
-                                                            //strcpy(respuesta,"Cliente quiere registrarse\n");
-                                                            //send(cliente, &respuesta, sizeof(respuesta), 0);
-                                                            //send(cliente, respuesta, strlen(respuesta)+1, 0);
                                                             strcpy(respuesta,"Ingrese su nombre de usuario\n");
-                                                            //send(cliente, &respuesta, sizeof(respuesta), 0);
                                                             send(cliente, respuesta, strlen(respuesta)+1, 0);
                                                             do{
                                                             nBytes = recv(cliente,us.user,MAX_USER+1,0);   
@@ -185,18 +176,14 @@ int main(void){
                                                                 close(cliente);
                                                                 return -1;
                                                             }
-                                                            printf("Comprobando\n");
                                                             check=comprobarnombre(us.user);
-                                                            printf("Analizando\n");
                                                             if(check==ERR_NOM)
                                                             {
-                                                                printf("Error nombre\n");
                                                                 strcpy(respuesta,"Nombre de usuario existente. Ingrese otro\n");
                                                                 send(cliente, respuesta, strlen(respuesta)+1, 0);
                                                             }
                                                             else if(check==ERR_FILE)
                                                             {
-                                                                printf("Error\n");
                                                                 strcpy(respuesta,"Error inesperado\n");
                                                                 send(cliente, respuesta, strlen(respuesta)+1, 0);
                                                                 close(cliente);
@@ -204,7 +191,6 @@ int main(void){
                                                             }
                                                             } while(check);
                                                             strcpy(respuesta,"Ingrese su contraseña (debe ser de entre 8 y 16 caracteres, combinando mayúsculas, minúsculas y números)\n");
-                                                            //send(cliente, &respuesta, sizeof(respuesta), 0);
                                                             send(cliente, respuesta, strlen(respuesta)+1, 0);
                                                             do{
                                                             nBytes = recv(cliente,us.password,MAX_PASS+1,0);  
@@ -264,13 +250,12 @@ int main(void){
                                                             }
                                                             else
                                                             {
-                                                                strcpy(respuesta,"Éxito al registrarse\n");
+                                                                strcpy(respuesta,"Exito al registrarse\n");
                                                                 strcat(respuesta,"Nombre de usario: ");
                                                                 strcat(respuesta,us.user);
                                                                 strcat(respuesta,"\nContraseña: ");
                                                                 strcat(respuesta,us.password);
                                                                 strcat(respuesta,"\n\n");
-                                                                //send(cliente, &respuesta, sizeof(respuesta), 0);
                                                                 send(cliente, respuesta, strlen(respuesta)+1, 0);
                                                             }
                                                             break;
@@ -297,7 +282,7 @@ int main(void){
                                             strcat(respuesta,inet_ntoa((struct in_addr)datosCliente.sin_addr));
                                             strcat(respuesta,"\n");
                                             send(cliente, &respuesta, sizeof(respuesta), 0);
-                                            
+                                            return 0;
                                         }
 				//}
         //}

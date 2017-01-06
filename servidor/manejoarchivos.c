@@ -2,12 +2,6 @@
 
 int comprobarnombre(char *nom)
 {
-    /*FILE *fp;
-    if(fp=fopen(PATH_REG,"rb")==NULL)
-    {
-        perror(PATH_REG);
-        return ERR_FILE;
-    }*/
     NODO *h=NULL,*last=NULL;
     NODO aux;
     if(CargarArchivo(PATH_REG,&h,&last)==ERR_FILE)
@@ -17,15 +11,12 @@ int comprobarnombre(char *nom)
         //Descomentar return si me interesa interrumpir el programa al no poder abrir el archivo
     }
     myStrncpy(aux.dato.user,nom,my_strlen(nom));
-    //printf("Buscando\n");
     if(BuscarNodo(&h,&aux,&last,SOLOBUSCAR)==ENCONTRO)
     {
-        //printf("Saliendo por error\n");
         return ERR_NOM;
     }
     else
     {
-        //printf("Saliendo por exito\n");
         return 0;
     }
 }
@@ -83,6 +74,7 @@ int registrar(DATO *usu)
         perror(PATH_REG);
         return ERR_FILE;
     }
+    usu->puntos=0;
     fwrite(usu,sizeof(DATO),1,fp);
     fclose(fp);
     return 0;
@@ -93,28 +85,27 @@ int CargarArchivo (char *ruta,NODO **h,NODO **last)
     FILE *fp;
     NODO *aux;
     DATO buffer;
-    if((fp=fopen(ruta,"rb"))==NULL)//r o rt: texto; rb: binario
+    if((fp=fopen(ruta,"rb"))==NULL)
     {
         perror(ruta);
         return ERR_FILE;
     }
     else
     {
+        PRINTENCABEZADO;
         fread(&buffer,sizeof(DATO),1,fp);
-        //FSCAN(buffer);
         while(!feof(fp))
         {
-            //FSCAN(buffer);
+            PRINTDATO(buffer);
             if((aux=(NODO*)malloc(sizeof(NODO)))==NULL)
             {
                 perror("malloc");
                 return -1;
             }
-            aux->dato=buffer;//Guardar en nodo el dato que leo de archivo
+            aux->dato=buffer;
             aux->sgte=NULL;
-            AgregarNodoAlFinal(h,aux,last);//Se guarda al final para respetar el orden en el que está guardado en el archivo
+            AgregarNodoAlFinal(h,aux,last);
             fread(&buffer,sizeof(DATO),1,fp);
-            //FSCAN(buffer);
         }
         fclose(fp);
     }
@@ -162,20 +153,15 @@ int BuscarNodo (NODO **h,NODO *aux,NODO **last,int instruccion)
   UNION datos1,datos2;
   Parsear(aux->dato,&datos2);
   int op;
-  //printf("En la función de búsqueda\n");
   if(instruccion==SOLOBUSCAR)
   {
-      //printf("Estoy acá\n");
       for(comp=(*h);comp!=NULL;comp=comp->sgte)
       {
-          //printf("Comparando\n");
           if(strcmp(comp->dato.user,aux->dato.user)==0)
           {
-              //printf("Encontró\n");
               return ENCONTRO;
           }
       }
-      //printf("No encontró\n");
       return NOENCONTRO;
   }
   for(comp=(*h);comp!=NULL;comp=comp->sgte)

@@ -2,10 +2,9 @@
 *	\file main.c
 *	\fn int main(void)
 *	\brief Función principal del cliente
- *	\author Pose, Fernando Ezequiel. (Fernandoepose@gmail.com)
- *	\date 2015.05.05  (última revisión: 2015.05.06)
-*	\return Retorna 0
-*	\version 1.3.1
+ *	\author Federico Ariel Marinzalda
+ *	\date 5/1/2017
+*	\version 1.4
 */
 
 //--------------
@@ -45,8 +44,7 @@ int main(void){
 	    
 	sockfd_cliente = login();
 
-	//nBytes = recv(sockfd_cliente,&respuesta,sizeof(respuesta),0);
-        nBytes = recv(sockfd_cliente,respuesta,MAX_REP,0);
+	nBytes = recv(sockfd_cliente,respuesta,MAX_REP,0);
 	if(nBytes<=0){            									
 		puts("Error en recv\r\n");
                 close(sockfd_cliente);
@@ -58,7 +56,6 @@ int main(void){
                     printf("Respuesta del servidor: %s\r\n",respuesta);
                     scanf(" %c",&op);
                     send(sockfd_cliente, &op, sizeof(op), 0);
-                    //nBytes = recv(sockfd_cliente,&respuesta,sizeof(respuesta),0);
                     nBytes = recv(sockfd_cliente,respuesta,MAX_REP,0);
                     if(nBytes<=0){            									
                         puts("Error en recv\r\n");
@@ -69,39 +66,31 @@ int main(void){
                         switch(op)
                         {
                             case 'R':
-                                /*nBytes = recv(sockfd_cliente,&respuesta,sizeof(respuesta),0);
-                                if(nBytes<=0){            									
-                                    puts("Error en recv\r\n");
-                                    close(sockfd_cliente);
-                                    return(-1);
-                                }*/
                                 printf("Respuesta del servidor: %s\r\n",respuesta);
                                 scanf("%s",us.user);
                                 send(sockfd_cliente, us.user, strlen(us.user)+1, 0);
-                                //nBytes = recv(sockfd_cliente,&respuesta,sizeof(respuesta),0);
                                 nBytes = recv(sockfd_cliente,respuesta,MAX_REP,0);
-                                //printf("nBytes = %d\n",nBytes);
                                 if(nBytes<=0){            									
                                     puts("Error en recv\r\n");
                                     close(sockfd_cliente);
                                     return(-1);
                                 }
                                 printf("Respuesta del servidor: %s\r\n",respuesta);
+                                while(myStrncmp(respuesta,"Exito",5))
+                                {
                                 scanf("%s",us.password);
                                 send(sockfd_cliente, us.password, strlen(us.password)+1, 0);
-                                //nBytes = recv(sockfd_cliente,&respuesta,sizeof(respuesta),0);
                                 nBytes = recv(sockfd_cliente,respuesta,MAX_REP,0);
                                 if(nBytes<=0){            									
                                     puts("Error en recv\r\n");
                                     close(sockfd_cliente);
                                     return(-1);
                                 }
-                                //TODO Tengo que comprobar que el servidor me pida ingresar contraseña, luego que me avise que sea válida para confirmarla y vverificar que el servidor aceptó la contraseña TODO
                                 printf("Respuesta del servidor: %s\r\n",respuesta);
+                                }
                         }
                     }
                 }
-                //recv(sockfd_cliente,&respuesta,sizeof(respuesta),0);
                 nBytes = recv(sockfd_cliente,respuesta,MAX_REP,0);
 		close(sockfd_cliente);
 		puts("Cliente desconectado del servidor.\r\n");
