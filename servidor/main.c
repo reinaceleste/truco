@@ -41,6 +41,7 @@ int main(void){
     int nBytes;
     int check;
     char checkpass[MAX_PASS+1];
+    int intentos;
      
           
     /*printf("*****************************************************\n");
@@ -152,11 +153,11 @@ int main(void){
                                         else
                                         {
                                             close(listener);
-                                            strcpy(respuesta,"Conexion aceptada\n\nR: Registrarse\nI: Iniciar sesion\nT: Jugar TrucoC\nS: Cerrar sesion\n\n");
+                                            strcpy(respuesta,"Conexion aceptada\n\nR: Registrarse\nI: Iniciar sesion\nT: Jugar TrucoC\nD: Salir del log del juego\nP: Ver puntuaciones\nS: Cerrar sesion\n\n");
                                             send(cliente, respuesta, strlen(respuesta)+1, 0);
+                                            nBytes = recv(cliente,&op,sizeof(op),0);  
                                             while(op!='S')
                                             {
-                                                nBytes = recv(cliente,&op,sizeof(op),0);   
                                                 if(nBytes<=0){            									
                                                     puts("Error en recv\r\n");
                                                     close(cliente);
@@ -167,8 +168,9 @@ int main(void){
                                                     switch(op)
                                                     {
                                                         case 'R':
-                                                            strcpy(respuesta,"Ingrese su nombre de usuario\n");
+                                                            strcpy(respuesta,"Ingrese su nombre de usuario (hasta 32 caracteres)\n");
                                                             send(cliente, respuesta, strlen(respuesta)+1, 0);
+                                                            intentos=1;
                                                             do{
                                                             nBytes = recv(cliente,us.user,MAX_USER+1,0);   
                                                             if(nBytes<=0){            									
@@ -179,8 +181,21 @@ int main(void){
                                                             check=comprobarnombre(us.user);
                                                             if(check==ERR_NOM)
                                                             {
-                                                                strcpy(respuesta,"Nombre de usuario existente. Ingrese otro\n");
-                                                                send(cliente, respuesta, strlen(respuesta)+1, 0);
+                                                                strcpy(respuesta,"Nombre de usuario existente. ");
+                                                                if(intentos<5)
+                                                                {
+                                                                    strcat(respuesta,"Ingrese otro\n");
+                                                                    send(cliente, respuesta, strlen(respuesta)+1, 0);
+                                                                }
+                                                            }
+                                                            else if(check==ERR_LONGNOM)
+                                                            {
+                                                                strcpy(respuesta,"Nombre muy largo. ");
+                                                                if(intentos<5)
+                                                                {
+                                                                    strcat(respuesta,"Ingrese uno de hasta 32 caracteres\n");
+                                                                    send(cliente, respuesta, strlen(respuesta)+1, 0);
+                                                                }
                                                             }
                                                             else if(check==ERR_FILE)
                                                             {
@@ -189,9 +204,17 @@ int main(void){
                                                                 close(cliente);
                                                                 return -1;
                                                             }
-                                                            } while(check);
+                                                            intentos++;
+                                                            } while(check && intentos<6);
+                                                            if(intentos==6)
+                                                            {
+                                                                strcat(respuesta,"5 intentos fallidos. Registro incorrecto\n");
+                                                                send(cliente, respuesta, strlen(respuesta)+1, 0);
+                                                                break;
+                                                            }
                                                             strcpy(respuesta,"Ingrese su contraseña (debe ser de entre 8 y 16 caracteres, combinando mayúsculas, minúsculas y números)\n");
                                                             send(cliente, respuesta, strlen(respuesta)+1, 0);
+                                                            intentos=1;
                                                             do{
                                                             nBytes = recv(cliente,us.password,MAX_PASS+1,0);  
                                                             if(nBytes<=0){            									
@@ -220,8 +243,11 @@ int main(void){
                                                                         strcpy(respuesta,"Su contraseña tiene más de 16 caracteres. ");
                                                                         break;
                                                                 }
+                                                                if(intentos<5)
+                                                                {
                                                                 strcat(respuesta,"Ingrese otra\n");
                                                                 send(cliente, respuesta, strlen(respuesta)+1, 0);
+                                                                }
                                                             }
                                                             else
                                                             {
@@ -237,11 +263,21 @@ int main(void){
                                                                 {
                                                                     check=1;
                                                                     strcpy(respuesta,"Las contraseñas ingresadas no coinciden\n");
+                                                                    if(intentos<5)
+                                                                    {
                                                                     strcat(respuesta,"Ingrese su contraseña (debe ser de entre 8 y 16 caracteres, combinando mayúsculas, minúsculas y números)\n");
                                                                     send(cliente, respuesta, strlen(respuesta)+1, 0);
+                                                                    }
                                                                 }
                                                             }
-                                                            } while(check);
+                                                            intentos++;
+                                                            } while(check && intentos<6);
+                                                            if(intentos==6)
+                                                            {
+                                                                strcat(respuesta,"5 intentos fallidos. Registro incorrecto\n");
+                                                                send(cliente, respuesta, strlen(respuesta)+1, 0);
+                                                                break;
+                                                            }
                                                             if(registrar(&us))
                                                             {
                                                                 strcpy(respuesta,"Error al completar el registro. ");
@@ -251,7 +287,7 @@ int main(void){
                                                             else
                                                             {
                                                                 strcpy(respuesta,"Exito al registrarse\n");
-                                                                strcat(respuesta,"Nombre de usario: ");
+                                                                strcat(respuesta,"Nombre de usuario: ");
                                                                 strcat(respuesta,us.user);
                                                                 strcat(respuesta,"\nContraseña: ");
                                                                 strcat(respuesta,us.password);
@@ -260,11 +296,103 @@ int main(void){
                                                             }
                                                             break;
                                                         case 'I':
-                                                            strcpy(respuesta,"Cliente quiere iniciar sesion\n");
+                                                            strcpy(respuesta,"Ingrese su nombre de usuario\n");
                                                             send(cliente, respuesta, strlen(respuesta)+1, 0);
+                                                            intentos=1;
+                                                            do{
+                                                            nBytes = recv(cliente,us.user,MAX_USER+1,0);   
+                                                            if(nBytes<=0){            									
+                                                                puts("Error en recv\r\n");
+                                                                close(cliente);
+                                                                return -1;
+                                                            }
+                                                            check=comprobarnombre(us.user);
+                                                            if(check==0)
+                                                            {
+                                                                strcpy(respuesta,"Nombre de usuario incorrecto. ");
+                                                                if(intentos<5)
+                                                                {
+                                                                    strcat(respuesta,"Ingrese su nombre de usuario\n");
+                                                                    send(cliente, respuesta, strlen(respuesta)+1, 0);
+                                                                }
+                                                            }
+                                                            else if(check==ERR_FILE)
+                                                            {
+                                                                strcpy(respuesta,"Error inesperado\n");
+                                                                send(cliente, respuesta, strlen(respuesta)+1, 0);
+                                                                close(cliente);
+                                                                return -1;
+                                                            }
+                                                            intentos++;
+                                                            } while(check!=ERR_NOM && intentos<6);
+                                                            if(intentos==6)
+                                                            {
+                                                                strcpy(respuesta,"5 intentos fallidos. Inicio de sesión interrumpida\n");
+                                                                send(cliente, respuesta, strlen(respuesta)+1, 0);
+                                                                break;
+                                                            }
+                                                            intentos=1;
+                                                            strcpy(respuesta,"Ingrese su contraseña\n");
+                                                            send(cliente, respuesta, strlen(respuesta)+1, 0);
+                                                            do{
+                                                            nBytes = recv(cliente,us.password,MAX_PASS+1,0);  
+                                                            if(nBytes<=0){            									
+                                                                puts("Error en recv\r\n");
+                                                                close(cliente);
+                                                                return -1;
+                                                            }
+                                                            check=comprobarpass(&us);
+                                                            if(check==ERR_PASS)
+                                                            {
+                                                                strcpy(respuesta,"Contraseña incorrecta. ");
+                                                                if(intentos<5)
+                                                                {
+                                                                    strcat(respuesta,"Ingrese su contraseña\n");
+                                                                    send(cliente, respuesta, strlen(respuesta)+1, 0);
+                                                                }
+                                                            }
+                                                            else if(check==ERR_FILE)
+                                                            {
+                                                                strcpy(respuesta,"Error inesperado\n");
+                                                                send(cliente, respuesta, strlen(respuesta)+1, 0);
+                                                                close(cliente);
+                                                                return -1;
+                                                            }
+                                                            intentos++;
+                                                            } while(check!=PASS_OK && intentos<6);
+                                                            if(intentos==6)
+                                                            {
+                                                                strcpy(respuesta,"5 intentos fallidos. Inicio de sesión interrumpida\n");
+                                                                send(cliente, respuesta, strlen(respuesta)+1, 0);
+                                                                break;
+                                                            }
+                                                            if(iniciarsesion(&us))
+                                                            {
+                                                                strcpy(respuesta,"Error al completar el registro. ");
+                                                                strcat(respuesta,"Intente más tarde\n");
+                                                                send(cliente, respuesta, strlen(respuesta)+1, 0);
+                                                            }
+                                                            else
+                                                            {
+                                                                strcpy(respuesta,"Exito al iniciar sesión\n");
+                                                                strcat(respuesta,"Nombre de usuario: ");
+                                                                strcat(respuesta,us.user);
+                                                                strcat(respuesta,"\nContraseña: ");
+                                                                strcat(respuesta,us.password);
+                                                                strcat(respuesta,"\n\n");
+                                                                send(cliente, respuesta, strlen(respuesta)+1, 0);
+                                                            }
                                                             break;
                                                         case 'T':
                                                             strcpy(respuesta,"Cliente quiere jugar\n");
+                                                            send(cliente, respuesta, strlen(respuesta)+1, 0);
+                                                            break;
+                                                        case 'P':
+                                                            strcpy(respuesta,"Cliente quiere ver puntuaciones\n");
+                                                            send(cliente, respuesta, strlen(respuesta)+1, 0);
+                                                            break;
+                                                        case 'D':
+                                                            strcpy(respuesta,"Cliente quiere desconectarse del log\n");
                                                             send(cliente, respuesta, strlen(respuesta)+1, 0);
                                                             break;
                                                         case 'S':
@@ -277,7 +405,9 @@ int main(void){
                                                             break;
                                                     }
                                                 }
+                                                nBytes = recv(cliente,&op,sizeof(op),0);
                                             }
+                                            cerrarsesion(&us);
                                             strcpy(respuesta,"Desconexion del cliente ");
                                             strcat(respuesta,inet_ntoa((struct in_addr)datosCliente.sin_addr));
                                             strcat(respuesta,"\n");

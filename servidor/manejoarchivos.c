@@ -8,17 +8,40 @@ int comprobarnombre(char *nom)
     {
         perror(PATH_REG);
         return ERR_FILE;
-        //Descomentar return si me interesa interrumpir el programa al no poder abrir el archivo
     }
     myStrncpy(aux.dato.user,nom,my_strlen(nom));
     if(BuscarNodo(&h,&aux,&last,SOLOBUSCAR)==ENCONTRO)
     {
+        BorrarLista(&h);
         return ERR_NOM;
+    }
+    else if(my_strlen(nom)>32)
+    {
+        BorrarLista(&h);
+        return ERR_LONGNOM;
     }
     else
     {
+        BorrarLista(&h);
         return 0;
     }
+}
+
+int comprobarpass(DATO *usu)
+{
+    NODO *h=NULL,*last=NULL;
+    NODO aux;
+    int res;
+    if(CargarArchivo(PATH_REG,&h,&last)==ERR_FILE)
+    {
+        perror(PATH_REG);
+        return ERR_FILE;
+    }
+    aux.dato=*usu;
+    res=BuscarNodo(&h,&aux,&last,BUSCARPASS);
+    printf("res = %d\n",res);
+    BorrarLista(&h);
+    return res;
 }
 
 int validarpass(char *pass)
@@ -80,6 +103,33 @@ int registrar(DATO *usu)
     return 0;
 }
 
+int iniciarsesion(DATO *usu)
+{
+    FILE *fp;
+    if((fp=fopen(PATH_INSES,"a+b"))==NULL)
+    {
+        perror(PATH_REG);
+        return ERR_FILE;
+    }
+    fwrite(usu,sizeof(DATO),1,fp);
+    fclose(fp);
+    return 0;
+}
+
+void cerrarsesion(DATO *usu)
+{
+    NODO *h=NULL,*last=NULL;
+    NODO aux;
+    if(CargarArchivo(PATH_INSES,&h,&last)==ERR_FILE)
+    {
+        perror(PATH_INSES);
+        return;
+    }
+    aux.dato=*usu;
+    BuscarNodo(&h,&aux,&last,BUSCARBORRAR);
+    GuardarLista(&h,PATH_INSES);
+}
+
 int CargarArchivo (char *ruta,NODO **h,NODO **last)
 {
     FILE *fp;
@@ -114,6 +164,38 @@ int CargarArchivo (char *ruta,NODO **h,NODO **last)
 
 /**
 ******************************************************
+*  \fn int GuardarLista (NODO **p,char *ruta)
+*  \brief Guarda todos los nodos de la lista a un archivo
+* \author Federico Ariel Marinzalda
+* \version 1.0
+* \date 9/10/2016
+* \param [in] **p Recibe dirección del primer nodo de la lista
+* \param [in] *ruta Nombre del archivo donde se guardan los datos
+*******************************************************/
+int GuardarLista (NODO **p,char *ruta)
+{
+    NODO *aux,*aux2;
+    FILE *fp;
+    if((fp=fopen(ruta,"w"))==NULL)//w o wt: texto; wb: binario
+    {
+      perror(ruta);
+      return ERR_FILE;
+    }
+    for(aux=*p;aux!=NULL;aux=aux2)
+    {
+        fwrite(&(aux->dato),sizeof(aux->dato),1,fp);
+        //fprintf(fp,"%s,%s,%s,%hu\n",aux->dato.datosinic.nombre,aux->dato.datosinic.apellido,aux->dato.datosinic.prof,aux->dato.intervencion);
+        //GUARDARARCHIVO(aux->dato);
+        aux2=aux->sgte;
+        free(aux);
+    }
+    *p=aux;
+    fclose(fp);
+    return FILEOK;
+}
+
+/**
+******************************************************
 *  \fn void BuscarAgregarNodoAlFinal (NODO **h,NODO *aux,NODO **last)
 *  \brief Función que busca un nodo y lo agrega si no lo encuentra
 * \author Federico Ariel Marinzalda
@@ -140,8 +222,8 @@ void BuscarAgregarNodoAlFinal (NODO **h,NODO *aux,NODO **last)
 *  \fn int BuscarNodo (NODO **h,NODO *aux,NODO **last,int instruccion)
 *  \brief Función que busca un nodo y lo agrega si no lo encuentra
 * \author Federico Ariel Marinzalda
-* \version 1.0
-* \date 19/11/2016
+* \version 1.3
+* \date 6/1/2017
 * \param [in] **h Dirección de inicio de la lista
 * \param [in] *aux Dirección del nodo a buscar
 * \param [in] **last Dirección de fin de la lista
@@ -152,7 +234,7 @@ int BuscarNodo (NODO **h,NODO *aux,NODO **last,int instruccion)
   NODO *comp,*prev;
   UNION datos1,datos2;
   Parsear(aux->dato,&datos2);
-  int op;
+  int op,fpass=REVISANDO;
   if(instruccion==SOLOBUSCAR)
   {
       for(comp=(*h);comp!=NULL;comp=comp->sgte)
@@ -163,6 +245,24 @@ int BuscarNodo (NODO **h,NODO *aux,NODO **last,int instruccion)
           }
       }
       return NOENCONTRO;
+  }
+  if(instruccion==BUSCARPASS)
+  {
+      for(comp=(*h);comp!=NULL && fpass==REVISANDO;comp=comp->sgte)
+      {
+          if(strcmp(comp->dato.user,aux->dato.user)==0)
+          {
+              if(strcmp(comp->dato.password,aux->dato.password)==0)
+              {
+                return PASS_OK;
+              }
+              else
+              {
+                  return ERR_PASS;
+              }
+          }
+      }
+      return ERR_PASS;
   }
   for(comp=(*h);comp!=NULL;comp=comp->sgte)
   {
@@ -208,7 +308,8 @@ int BuscarNodo (NODO **h,NODO *aux,NODO **last,int instruccion)
                 scanf("%d",&op);
             }
         }
-        free(aux);
+        //TODO revisar este fre TODO
+        //free(aux);
         return ENCONTRO;
     }
     prev=comp;
@@ -227,6 +328,16 @@ void AgregarNodoAlFinal (NODO **h,NODO *aux,NODO **last)
     (*last)->sgte=aux;
   }
   *last=aux;
+}
+
+void BorrarLista (NODO **p)
+{
+    NODO *aux,*aux2;
+    for(aux=*p;aux!=NULL;aux=aux2)
+    {
+        aux2=aux->sgte;
+        free(aux);
+    }
 }
 
 void CambiarDato (DATO *d,int op)

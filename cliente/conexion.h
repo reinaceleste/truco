@@ -28,7 +28,7 @@
 #define MAX_IP 14
 #define MAX_CONEXIONES 10
 #define PATH_CONFIG "config.txt"
-#define MAX_USER 32
+#define MAX_USER 40
 #define MAX_PASS 24
 #define NULLCHAR '\0'
 
@@ -53,5 +53,6 @@ void datos_server(struct datos* configuracion);
 int login(void);
 char *gets_s(char *s, int size);
 int myStrncmp (const char* s1,const char* s2,int n);
+int my_strlen (char* palabra);;
 
 #endif

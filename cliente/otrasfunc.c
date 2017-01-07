@@ -28,3 +28,21 @@ int myStrncmp (const char* s1,const char* s2,int n)
   }
   return (int)(*(s2+i)-*(s1+i)); //Si estoy en esta línea, devuelvo la diferencia entre el último caracter a comparar de s1 y el último caracter a comparar de s2
 }
+
+/**
+******************************************************
+*  \fn int my_strlen (char* palabra)
+*  \brief Función que calcula la longitud de una palabra
+* \author Federico Ariel Marinzalda
+* \version 1.0
+* \date 28/6/2016
+* \param [in] *palabra Palabra cuya longitud quiere determinarse
+* \param [out] i Longitud de la palabra
+* \returns Devuelve número entero
+*******************************************************/
+int my_strlen (char* palabra)
+{
+  int i;
+  for (i=0;*(palabra+i)!=NULLCHAR;i++);
+  return i;
+}

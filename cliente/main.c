@@ -67,7 +67,10 @@ int main(void){
                         {
                             case 'R':
                                 printf("Respuesta del servidor: %s\r\n",respuesta);
-                                scanf("%s",us.user);
+                                while(myStrncmp(respuesta,"Ingrese su contraseña",my_strlen("Ingrese su contraseña")) && myStrncmp(respuesta,"Nombre de usuario existente. 5",my_strlen("Nombre de usuario existente. 5")) && myStrncmp(respuesta,"Nombre muy largo. 5",my_strlen("Nombre muy largo. 5")))
+                                {
+                                    fflush(stdin);
+                                    scanf("%s",us.user);
                                 send(sockfd_cliente, us.user, strlen(us.user)+1, 0);
                                 nBytes = recv(sockfd_cliente,respuesta,MAX_REP,0);
                                 if(nBytes<=0){            									
@@ -76,8 +79,14 @@ int main(void){
                                     return(-1);
                                 }
                                 printf("Respuesta del servidor: %s\r\n",respuesta);
-                                while(myStrncmp(respuesta,"Exito",5))
+                                }
+                                if(myStrncmp(respuesta,"Ingrese su contraseña",my_strlen("Ingrese su contraseña")))
                                 {
+                                    break;
+                                }
+                                while(myStrncmp(respuesta,"Exito",5) && myStrncmp(respuesta,"Su contraseña no posee números. 5",my_strlen("Su contraseña no posee números. 5")) && myStrncmp(respuesta,"Su contraseña tiene menos de 8 caracteres. 5",my_strlen("Su contraseña tiene menos de 8 caracteres. 5")) && myStrncmp(respuesta,"Su contraseña no posee mayúsculas. 5",my_strlen("Su contraseña no posee mayúsculas. 5")) && myStrncmp(respuesta,"Su contraseña no posee minúsculas. 5",my_strlen("Su contraseña no posee minúsculas. 5")) && myStrncmp(respuesta,"Su contraseña tiene más de 16 caracteres. 5",my_strlen("Su contraseña tiene más de 16 caracteres. 5")))
+                                {
+                                    fflush(stdin);
                                 scanf("%s",us.password);
                                 send(sockfd_cliente, us.password, strlen(us.password)+1, 0);
                                 nBytes = recv(sockfd_cliente,respuesta,MAX_REP,0);
@@ -87,6 +96,50 @@ int main(void){
                                     return(-1);
                                 }
                                 printf("Respuesta del servidor: %s\r\n",respuesta);
+                                }
+                                if(myStrncmp(respuesta,"Exito",5))
+                                {
+                                    break;
+                                }
+                            case 'I':
+                                printf("Respuesta del servidor: %s\r\n",respuesta);
+                                while(myStrncmp(respuesta,"Ingrese su contra",my_strlen("Ingrese su contra")) && myStrncmp(respuesta,"Nombre de usuario incorrecto. 5",my_strlen("Nombre de usuario incorrecto. 5")))
+                                {
+                                    fflush(stdin);
+                                    scanf("%s",us.user);
+                                send(sockfd_cliente, us.user, strlen(us.user)+1, 0);
+                                nBytes = recv(sockfd_cliente,respuesta,MAX_REP,0);
+                                if(nBytes<=0){            									
+                                    puts("Error en recv\r\n");
+                                    close(sockfd_cliente);
+                                    return(-1);
+                                }
+                                printf("Respuesta del servidor: %s\r\n",respuesta);
+                                }
+                                printf("Salí del while\n");
+                                if(myStrncmp(respuesta,"Ingrese su contra",my_strlen("Ingrese su contra")))
+                                {
+                                    printf("Error\n");
+                                    break;
+                                }
+                                while(myStrncmp(respuesta,"Exito",5) && myStrncmp(respuesta,"Contraseña incorrecta. 5",my_strlen("Contraseña incorrecta. 5")))
+                                {
+                                    fflush(stdin);
+                                scanf("%s",us.password);
+                                send(sockfd_cliente, us.password, strlen(us.password)+1, 0);
+                                nBytes = recv(sockfd_cliente,respuesta,MAX_REP,0);
+                                if(nBytes<=0){            									
+                                    puts("Error en recv\r\n");
+                                    close(sockfd_cliente);
+                                    return(-1);
+                                }
+                                printf("Respuesta del servidor: %s\r\n",respuesta);
+                                }
+                                printf("Salí del while\n");
+                                if(myStrncmp(respuesta,"Exito",5))
+                                {
+                                    printf("Error\n");
+                                    break;
                                 }
                         }
                     }

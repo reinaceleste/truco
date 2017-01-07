@@ -30,14 +30,19 @@
 #define MAX_CONEXIONES 10
 #define PATH_CONFIG "config.txt"
 #define PATH_REG "usuariosregistrados"
-#define MAX_USER 32
+#define PATH_INSES "ipensesion"
+#define MAX_USER 40
 #define MAX_PASS 24
 #define ERR_MAYUS -3
 #define ERR_MINUS -4
 #define ERR_NUM -1
 #define ERR_8CAR -2
 #define ERR_16CAR -5
+#define ERR_PASS -1
+#define PASS_OK 10
+#define REVISANDO 30
 #define ERR_NOM -1
+#define ERR_LONGNOM -2
 #define ERR_FILE 99
 #define FILEOK 0
 #define NULLCHAR '\0'
@@ -45,6 +50,7 @@
 #define BUSCARAGREGAR 1
 #define BUSCARBORRAR 2
 #define BUSCARMODIFICAR 3
+#define BUSCARPASS 4
 #define ENCONTRO 1
 #define NOENCONTRO 0
 #define DATO1(x) (x.user)
@@ -97,15 +103,20 @@ int login(void);
 int recibir(int socket,char *buffer,int tamano,fd_set *master);
 void BuscarAgregarNodoAlFinal (NODO **h,NODO *aux,NODO **last);
 int comprobarnombre(char* nom);
+int comprobarpass(DATO *usu);
 int validarpass(char *pass);
 int registrar(DATO *usu);
+int iniciarsesion(DATO *usu);
+void cerrarsesion(DATO *usu);
 void AgregarNodoAlFinal (NODO **h,NODO *aux,NODO **last);
 int BuscarNodo (NODO **h,NODO *aux,NODO **last,int instruccion);
+void BorrarLista (NODO **p);
 int my_strlen (char* palabra);
 void Parsear(DATO d,UNION *u);
 void CambiarDato (DATO *d,int op);
 int myStrncpy (char* dest,char* origen,int n);
 int mystructcmp (const char *s1,const char *s2,size_t n);
 int CargarArchivo (char *ruta,NODO **h,NODO **last);
+int GuardarLista (NODO **p,char *ruta);
 
 #endif
