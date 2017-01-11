@@ -17,7 +17,7 @@
 //--  Defines  --
 //---------------
 
-#define MAX_DATOS 600
+#define MAX_DATOS 1000
 
 int main(void){
      
@@ -153,7 +153,7 @@ int main(void){
                                         else
                                         {
                                             close(listener);
-                                            strcpy(respuesta,"Conexion aceptada\n\nR: Registrarse\nI: Iniciar sesion\nT: Jugar TrucoC\nD: Salir del log del juego\nP: Ver puntuaciones\nS: Cerrar sesion\n\n");
+                                            strcpy(respuesta,"Conexion aceptada\n\nR: Registrarse\nI: Iniciar sesion\nT: Jugar TrucoC\nD: Salir del log del juego\nP: Ver puntuaciones\nN: No ver más las puntuaciones\nS: Cerrar sesion\n\n");
                                             send(cliente, respuesta, strlen(respuesta)+1, 0);
                                             nBytes = recv(cliente,&op,sizeof(op),0);  
                                             while(op!='S')
@@ -366,11 +366,20 @@ int main(void){
                                                                 send(cliente, respuesta, strlen(respuesta)+1, 0);
                                                                 break;
                                                             }
-                                                            if(iniciarsesion(&us))
+                                                            check=iniciarsesion(&us);
+                                                            if(check)
                                                             {
-                                                                strcpy(respuesta,"Error al completar el registro. ");
-                                                                strcat(respuesta,"Intente más tarde\n");
-                                                                send(cliente, respuesta, strlen(respuesta)+1, 0);
+                                                                if(check==ERR_INSES)
+                                                                {
+                                                                    strcpy(respuesta,"Este usuario ya inició sesión\n");
+                                                                    send(cliente, respuesta, strlen(respuesta)+1, 0);
+                                                                }
+                                                                else
+                                                                {
+                                                                    strcpy(respuesta,"Error al iniciar sesion. ");
+                                                                    strcat(respuesta,"Intente más tarde\n");
+                                                                    send(cliente, respuesta, strlen(respuesta)+1, 0);
+                                                                }
                                                             }
                                                             else
                                                             {
@@ -388,7 +397,17 @@ int main(void){
                                                             send(cliente, respuesta, strlen(respuesta)+1, 0);
                                                             break;
                                                         case 'P':
-                                                            strcpy(respuesta,"Cliente quiere ver puntuaciones\n");
+                                                            if(puntuaciones(&us,respuesta)==ERR_PUNT)
+                                                            {
+                                                                strcpy(respuesta,"Error inesperado\n");
+                                                                send(cliente, respuesta, strlen(respuesta)+1, 0);
+                                                                close(cliente);
+                                                                return -1;
+                                                            }
+                                                            send(cliente, respuesta, strlen(respuesta)+1, 0);
+                                                            break;
+                                                        case 'N':
+                                                            strcpy(respuesta,"Cliente quiere dejar de ver puntuaciones\n");
                                                             send(cliente, respuesta, strlen(respuesta)+1, 0);
                                                             break;
                                                         case 'D':

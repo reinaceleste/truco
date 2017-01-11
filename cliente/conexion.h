@@ -31,6 +31,13 @@
 #define MAX_USER 40
 #define MAX_PASS 24
 #define NULLCHAR '\0'
+#define NADA 0
+#define ENSESION 1
+#define VIENDOPUNTUACIONES 2
+#define ENLOG 3
+#define JUGANDO 4
+#define SI 1
+#define NO 0
 
 //-----------------
 //-- Estructuras --

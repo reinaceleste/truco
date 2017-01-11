@@ -14,7 +14,7 @@
 #include "conexion.h"
 
 #define MAX_NOM 50
-#define MAX_REP 600
+#define MAX_REP 1000
 
 int main(void){
     
@@ -22,7 +22,8 @@ int main(void){
     int nBytes;
     char nombre[MAX_NOM];
     char respuesta[MAX_REP];
-    char op='E';
+    char op='E',opvalida;
+    char estado=NADA,ingreso=NO;
     struct usuario us;
      
     /*system("clear"); 
@@ -55,6 +56,56 @@ int main(void){
                 {
                     printf("Respuesta del servidor: %s\r\n",respuesta);
                     scanf(" %c",&op);
+                    switch(op)
+                    {
+                        case 'R':
+                            if(estado==NADA)
+                            {
+                                opvalida=SI;
+                            }
+                            else
+                            {
+                                opvalida=NO;
+                            }
+                            break;
+                        case 'I':
+                            if(estado==NADA)
+                            {
+                                opvalida=SI;
+                            }
+                            else
+                            {
+                                opvalida=NO;
+                            }
+                            break;
+                        case 'P':
+                            if(estado!=VIENDOPUNTUACIONES)
+                            {
+                                opvalida=SI;
+                            }
+                            else
+                            {
+                                opvalida=NO;
+                            }
+                            break;
+                        case 'N':
+                            if(estado==VIENDOPUNTUACIONES)
+                            {
+                                opvalida=SI;
+                            }
+                            else
+                            {
+                                opvalida=NO;
+                            }
+                            break;
+                        case 'S':
+                            opvalida=SI;
+                            break;
+                        default:
+                            break;
+                    }
+                    if(opvalida==SI)
+                    {
                     send(sockfd_cliente, &op, sizeof(op), 0);
                     nBytes = recv(sockfd_cliente,respuesta,MAX_REP,0);
                     if(nBytes<=0){            									
@@ -101,6 +152,7 @@ int main(void){
                                 {
                                     break;
                                 }
+                                break;
                             case 'I':
                                 printf("Respuesta del servidor: %s\r\n",respuesta);
                                 while(myStrncmp(respuesta,"Ingrese su contra",my_strlen("Ingrese su contra")) && myStrncmp(respuesta,"Nombre de usuario incorrecto. 5",my_strlen("Nombre de usuario incorrecto. 5")))
@@ -116,10 +168,8 @@ int main(void){
                                 }
                                 printf("Respuesta del servidor: %s\r\n",respuesta);
                                 }
-                                printf("Salí del while\n");
                                 if(myStrncmp(respuesta,"Ingrese su contra",my_strlen("Ingrese su contra")))
                                 {
-                                    printf("Error\n");
                                     break;
                                 }
                                 while(myStrncmp(respuesta,"Exito",5) && myStrncmp(respuesta,"Contraseña incorrecta. 5",my_strlen("Contraseña incorrecta. 5")))
@@ -135,13 +185,34 @@ int main(void){
                                 }
                                 printf("Respuesta del servidor: %s\r\n",respuesta);
                                 }
-                                printf("Salí del while\n");
                                 if(myStrncmp(respuesta,"Exito",5))
                                 {
-                                    printf("Error\n");
                                     break;
                                 }
+                                estado=ENSESION;
+                                ingreso=SI;
+                                break;
+                            case 'P':
+                                printf("Respuesta del servidor: %s\r\n",respuesta);
+                                estado=VIENDOPUNTUACIONES;
+                                break;
+                            case 'N':
+                                printf("Respuesta del servidor: %s\r\n",respuesta);
+                                if(ingreso==SI)
+                                {
+                                    estado=ENSESION;
+                                }
+                                else
+                                {
+                                    estado=NADA;
+                                }
+                                break;
                         }
+                    }
+                    }
+                    else
+                    {
+                        printf("Opción no válida\n");
                     }
                 }
                 nBytes = recv(sockfd_cliente,respuesta,MAX_REP,0);
