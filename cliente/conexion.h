@@ -18,6 +18,7 @@
 #include <unistd.h>
 #include <sys/time.h>
 #include <sys/types.h>
+#include <signal.h>
 
 
 //-------------
@@ -60,6 +61,6 @@ void datos_server(struct datos* configuracion);
 int login(void);
 char *gets_s(char *s, int size);
 int myStrncmp (const char* s1,const char* s2,int n);
-int my_strlen (char* palabra);;
+int my_strlen (char* palabra);
 
 #endif

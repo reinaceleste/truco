@@ -18,30 +18,13 @@
 
 int main(void){
     
-	int sockfd_cliente;
-    int nBytes;
+    int sockfd_cliente;
+    int nBytes,opjug,finicio=SI;
     char nombre[MAX_NOM];
     char respuesta[MAX_REP];
-    char op='E',opvalida;
+    char op='E',opvalida,opflor;
     char estado=NADA,ingreso=NO;
     struct usuario us;
-     
-    /*system("clear"); 
-     
-    printf("*****************************************************\n");
-    printf("*										  		    *\n");
-    printf("*      .:Trabajo Practico I - Clente/Servidor:.		*\n");
-    printf("*					CLIENTE				  			*\n");
-    printf("*****************************************************\n");*/
-    
-     
-	/*printf("Ingrese continuar o salir (minusculas) para cerrar la aplicacion: \r\n"); 
-	gets_s(nombre,MAX_NOM);
-	 
-	if(strcmp(nombre,"continuar")){
-		puts("\r\nCliente desconectado del servidor.\r\n");
-		return(0);
-	}*/
 	    
 	sockfd_cliente = login();
 
@@ -54,7 +37,14 @@ int main(void){
 	else{                                                        
 		while(op!='S')
                 {
-                    printf("Respuesta del servidor: %s\r\n",respuesta);
+                    if(opvalida==SI || finicio==SI)
+                    {
+                        printf("Respuesta del servidor: %s\r\n",respuesta);
+                    }
+                    if(finicio==SI)
+                    {
+                        finicio=NO;
+                    }
                     scanf(" %c",&op);
                     switch(op)
                     {
@@ -101,7 +91,28 @@ int main(void){
                         case 'S':
                             opvalida=SI;
                             break;
+                        case 'T':
+                            if(estado==ENSESION)
+                            {
+                                opvalida=SI;
+                            }
+                            else
+                            {
+                                opvalida=NO;
+                            }
+                            break;
+                        case 'D':
+                            if(estado==ENLOG)
+                            {
+                                opvalida=SI;
+                            }
+                            else
+                            {
+                                opvalida=NO;
+                            }
+                            break;
                         default:
+                            opvalida=NO;
                             break;
                     }
                     if(opvalida==SI)
@@ -122,14 +133,14 @@ int main(void){
                                 {
                                     fflush(stdin);
                                     scanf("%s",us.user);
-                                send(sockfd_cliente, us.user, strlen(us.user)+1, 0);
-                                nBytes = recv(sockfd_cliente,respuesta,MAX_REP,0);
-                                if(nBytes<=0){            									
-                                    puts("Error en recv\r\n");
-                                    close(sockfd_cliente);
-                                    return(-1);
-                                }
-                                printf("Respuesta del servidor: %s\r\n",respuesta);
+                                    send(sockfd_cliente, us.user, strlen(us.user)+1, 0);
+                                    nBytes = recv(sockfd_cliente,respuesta,MAX_REP,0);
+                                    if(nBytes<=0){            									
+                                        puts("Error en recv\r\n");
+                                        close(sockfd_cliente);
+                                        return(-1);
+                                    }
+                                    printf("Respuesta del servidor: %s\r\n",respuesta);
                                 }
                                 if(myStrncmp(respuesta,"Ingrese su contraseña",my_strlen("Ingrese su contraseña")))
                                 {
@@ -138,20 +149,23 @@ int main(void){
                                 while(myStrncmp(respuesta,"Exito",5) && myStrncmp(respuesta,"Su contraseña no posee números. 5",my_strlen("Su contraseña no posee números. 5")) && myStrncmp(respuesta,"Su contraseña tiene menos de 8 caracteres. 5",my_strlen("Su contraseña tiene menos de 8 caracteres. 5")) && myStrncmp(respuesta,"Su contraseña no posee mayúsculas. 5",my_strlen("Su contraseña no posee mayúsculas. 5")) && myStrncmp(respuesta,"Su contraseña no posee minúsculas. 5",my_strlen("Su contraseña no posee minúsculas. 5")) && myStrncmp(respuesta,"Su contraseña tiene más de 16 caracteres. 5",my_strlen("Su contraseña tiene más de 16 caracteres. 5")))
                                 {
                                     fflush(stdin);
-                                scanf("%s",us.password);
-                                send(sockfd_cliente, us.password, strlen(us.password)+1, 0);
-                                nBytes = recv(sockfd_cliente,respuesta,MAX_REP,0);
-                                if(nBytes<=0){            									
-                                    puts("Error en recv\r\n");
-                                    close(sockfd_cliente);
-                                    return(-1);
+                                    scanf("%s",us.password);
+                                    send(sockfd_cliente, us.password, strlen(us.password)+1, 0);
+                                    nBytes = recv(sockfd_cliente,respuesta,MAX_REP,0);
+                                    if(nBytes<=0){            									
+                                        puts("Error en recv\r\n");
+                                        close(sockfd_cliente);
+                                        return(-1);
+                                    }
+                                    if(myStrncmp(respuesta,"Exito",5))
+                                    {
+                                        printf("Respuesta del servidor: %s\r\n",respuesta);
+                                    }
                                 }
-                                printf("Respuesta del servidor: %s\r\n",respuesta);
-                                }
-                                if(myStrncmp(respuesta,"Exito",5))
+                                /*if(myStrncmp(respuesta,"Exito",5))
                                 {
                                     break;
-                                }
+                                }*/
                                 break;
                             case 'I':
                                 printf("Respuesta del servidor: %s\r\n",respuesta);
@@ -159,14 +173,14 @@ int main(void){
                                 {
                                     fflush(stdin);
                                     scanf("%s",us.user);
-                                send(sockfd_cliente, us.user, strlen(us.user)+1, 0);
-                                nBytes = recv(sockfd_cliente,respuesta,MAX_REP,0);
-                                if(nBytes<=0){            									
-                                    puts("Error en recv\r\n");
-                                    close(sockfd_cliente);
-                                    return(-1);
-                                }
-                                printf("Respuesta del servidor: %s\r\n",respuesta);
+                                    send(sockfd_cliente, us.user, strlen(us.user)+1, 0);
+                                    nBytes = recv(sockfd_cliente,respuesta,MAX_REP,0);
+                                    if(nBytes<=0){            									
+                                        puts("Error en recv\r\n");
+                                        close(sockfd_cliente);
+                                        return(-1);
+                                    }
+                                    printf("Respuesta del servidor: %s\r\n",respuesta);
                                 }
                                 if(myStrncmp(respuesta,"Ingrese su contra",my_strlen("Ingrese su contra")))
                                 {
@@ -175,15 +189,18 @@ int main(void){
                                 while(myStrncmp(respuesta,"Exito",5) && myStrncmp(respuesta,"Contraseña incorrecta. 5",my_strlen("Contraseña incorrecta. 5")))
                                 {
                                     fflush(stdin);
-                                scanf("%s",us.password);
-                                send(sockfd_cliente, us.password, strlen(us.password)+1, 0);
-                                nBytes = recv(sockfd_cliente,respuesta,MAX_REP,0);
-                                if(nBytes<=0){            									
-                                    puts("Error en recv\r\n");
-                                    close(sockfd_cliente);
-                                    return(-1);
-                                }
-                                printf("Respuesta del servidor: %s\r\n",respuesta);
+                                    scanf("%s",us.password);
+                                    send(sockfd_cliente, us.password, strlen(us.password)+1, 0);
+                                    nBytes = recv(sockfd_cliente,respuesta,MAX_REP,0);
+                                    if(nBytes<=0){            									
+                                        puts("Error en recv\r\n");
+                                        close(sockfd_cliente);
+                                        return(-1);
+                                    }
+                                    if(myStrncmp(respuesta,"Exito",5))
+                                    {
+                                        printf("Respuesta del servidor: %s\r\n",respuesta);
+                                    }
                                 }
                                 if(myStrncmp(respuesta,"Exito",5))
                                 {
@@ -193,11 +210,11 @@ int main(void){
                                 ingreso=SI;
                                 break;
                             case 'P':
-                                printf("Respuesta del servidor: %s\r\n",respuesta);
+                                //printf("Respuesta del servidor: %s\r\n",respuesta);
                                 estado=VIENDOPUNTUACIONES;
                                 break;
                             case 'N':
-                                printf("Respuesta del servidor: %s\r\n",respuesta);
+                                //printf("Respuesta del servidor: %s\r\n",respuesta);
                                 if(ingreso==SI)
                                 {
                                     estado=ENSESION;
@@ -206,6 +223,62 @@ int main(void){
                                 {
                                     estado=NADA;
                                 }
+                                break;
+                            case 'T':
+                                printf("Respuesta del servidor: %s\r\n",respuesta);
+                                scanf(" %c",&opflor);
+                                send(sockfd_cliente,&opflor,sizeof(opflor), 0);
+                                nBytes = recv(sockfd_cliente,respuesta,MAX_REP,0);
+                                if(nBytes<=0){            									
+                                    puts("Error en recv\r\n");
+                                    close(sockfd_cliente);
+                                    return(-1);
+                                }
+                                while(!(opflor=='S' || opflor=='N' || opflor=='0'))
+                                {
+                                    printf("Respuesta del servidor: %s\r\n",respuesta);
+                                    scanf(" %c",&opflor);
+                                    send(sockfd_cliente,&opflor,sizeof(opflor), 0);
+                                    nBytes = recv(sockfd_cliente,respuesta,MAX_REP,0);
+                                    if(nBytes<=0){            									
+                                        puts("Error en recv\r\n");
+                                        close(sockfd_cliente);
+                                        return(-1);
+                                    }
+                                }
+                                if(opflor=='0')
+                                {
+                                    break;
+                                }
+                                printf("Respuesta del servidor: %s\r\n",respuesta);
+                                scanf("%d",&opjug);
+                                send(sockfd_cliente,&opjug,sizeof(opjug), 0);
+                                nBytes = recv(sockfd_cliente,respuesta,MAX_REP,0);
+                                if(nBytes<=0){            									
+                                    puts("Error en recv\r\n");
+                                    close(sockfd_cliente);
+                                    return(-1);
+                                }
+                                while(opjug>3)
+                                {
+                                    printf("Respuesta del servidor: %s\r\n",respuesta);
+                                    scanf("%d",&opjug);
+                                    send(sockfd_cliente,&opjug,sizeof(opjug), 0);
+                                    nBytes = recv(sockfd_cliente,respuesta,MAX_REP,0);
+                                    if(nBytes<=0){            									
+                                        puts("Error en recv\r\n");
+                                        close(sockfd_cliente);
+                                        return(-1);
+                                    }
+                                }
+                                if(opjug==0)
+                                {
+                                    break;
+                                }
+                                estado=ENLOG;
+                                break;
+                            case 'D':
+                                estado=ENSESION;
                                 break;
                         }
                     }

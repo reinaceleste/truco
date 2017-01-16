@@ -19,10 +19,13 @@
 
 #define MAX_DATOS 1000
 
+int listener;                      	    //Socket que recibe las conexiones.
+int cliente;                           //cliente que se conecta.
+
 int main(void){
      
-	int listener;                      	    //Socket que recibe las conexiones.
-    int cliente;                           //cliente que se conecta.
+    //int listener;                      	    //Socket que recibe las conexiones.
+    //int cliente;                           //cliente que se conecta.
     struct sockaddr_in datosServer;       //Datos del servidor.
     struct sockaddr_in datosCliente;     //Datos del cliente.
     int clienteConectado;               //Flag que indica que el cliente se conecto.
@@ -37,8 +40,8 @@ int main(void){
     char respuesta[MAX_DATOS]; //Respuesta del servidor como que el cliente se conecto.
     struct usuario us;
     pid_t pid;
-    char op='E';
-    int nBytes;
+    char op='E',opflor;
+    int nBytes,opjug;
     int check;
     char checkpass[MAX_PASS+1];
     int intentos;
@@ -55,13 +58,16 @@ int main(void){
         
     //Cargo ip y puerto en las variables.
      
+    signal(SIGINT,siginthandler);
+    signal(SIGCHLD,sigchldhandler);
+    
     datos_server(&configuracion);
      
     //Creo el socket que escucha las conexiones.
      
     listener = socket(AF_INET,SOCK_STREAM,0);// Socket(domain, tipoDeTransmicion, protocol)=>(ipv4, stream, defaultForDomain)
     if(listener == -1){
-	    printf("Error en listener");
+	    printf("Error en listener\n");
 	    return(-1);
      }
      
@@ -85,20 +91,20 @@ int main(void){
     //Enlazo el socket a la ip:puerto contenida en la estructura datosServer.
      
     if(bind(listener, (struct sockaddr*) &datosServer, sizeof datosServer) == -1){ 
-		printf("Error en bind");
+		printf("Error en bind\n");
 	    return(-1);
     }
      
     //Pongo el server a la escucha (enciendo el servidor)
      
     if((listen(listener,MAX_CONEXIONES)) == -1){
-		printf("Error en listen");
+		printf("Error en listen\n");
 		return(-1);
     }
      
     //Aviso que el servidor está conectado.
      
-    puts("Servidor conectado");
+    puts("Servidor conectado\r\n");
      
     //FD_ZERO(&master);  
     //FD_ZERO(&readset);
@@ -135,7 +141,8 @@ int main(void){
 					
 					cliente = accept(listener, (struct sockaddr*) &datosCliente, &addrlen);  //TODO Hasta acá es el login de parte del cliente.
 					if(cliente == -1){ 
-						printf("Error en accept");	     
+						printf("Error en accept\n");
+                                                return(-1);
 					}
 					else
                                         {
@@ -147,8 +154,8 @@ int main(void){
                                         if(pid)
                                         {
                                             close(cliente);
-					printf("La siguiente IP se ha conectado IP: %s\n",inet_ntoa((struct in_addr)datosCliente.sin_addr));
-					wait(NULL);
+                                            printf("La siguiente IP se ha conectado IP: %s\n",inet_ntoa((struct in_addr)datosCliente.sin_addr));
+                                            wait(NULL);
                                         }
                                         else
                                         {
@@ -393,8 +400,106 @@ int main(void){
                                                             }
                                                             break;
                                                         case 'T':
-                                                            strcpy(respuesta,"Cliente quiere jugar\n");
+                                                            strcpy(respuesta,"Ingrese modalidad (S para jugar con flor, N para jugar sin flor, 0 (cero) para abortar y volver al menú principal)\n");
                                                             send(cliente, respuesta, strlen(respuesta)+1, 0);
+                                                            do
+                                                            {
+                                                                nBytes = recv(cliente,&opflor,sizeof(opflor),0);   
+                                                                if(nBytes<=0){            									
+                                                                    puts("Error en recv\r\n");
+                                                                    close(cliente);
+                                                                    return -1;
+                                                                }
+                                                                if(!(opflor=='S' || opflor=='N' || opflor=='0'))
+                                                                {
+                                                                     strcpy(respuesta,"Opción incorrecta.\nIngrese modalidad (S para jugar con flor, N para jugar sin flor, 0 (cero) para abortar y volver al menú principal)\n");
+                                                                     send(cliente, respuesta, strlen(respuesta)+1, 0);
+                                                                }
+                                                            } while(!(opflor=='S' || opflor=='N' || opflor=='0'));
+                                                            if(opflor=='0')
+                                                            {
+                                                                strcpy(respuesta,"Se aborta el ingreso al log\n");
+                                                                send(cliente, respuesta, strlen(respuesta)+1, 0);
+                                                                break;
+                                                            }
+                                                            strcpy(respuesta,"Ingrese cantidad de jugadores por equipo (hasta 3; ingrese 0 (cero) para abortar y volver al menú principal)\n");
+                                                            send(cliente, respuesta, strlen(respuesta)+1, 0);
+                                                            do
+                                                            {
+                                                                nBytes = recv(cliente,&opjug,sizeof(opjug),0);   
+                                                                if(nBytes<=0){            									
+                                                                    puts("Error en recv\r\n");
+                                                                    close(cliente);
+                                                                    return -1;
+                                                                }
+                                                                if(opjug>3)
+                                                                {
+                                                                     strcpy(respuesta,"Opción incorrecta.\nIngrese cantidad de jugadores por equipo (hasta 3; ingrese 0 (cero) para abortar y volver al menú principal)\n");
+                                                                     send(cliente, respuesta, strlen(respuesta)+1, 0);
+                                                                }
+                                                            } while(opjug>3);
+                                                            if(opjug==0)
+                                                            {
+                                                                strcpy(respuesta,"Se aborta el ingreso al log\n");
+                                                                send(cliente, respuesta, strlen(respuesta)+1, 0);
+                                                                break;
+                                                            }
+                                                            check=ingresolog(&us,opflor,opjug);
+                                                            if(check==ERR_FILE)
+                                                            {
+                                                                strcpy(respuesta,"Error inesperado\n");
+                                                                send(cliente, respuesta, strlen(respuesta)+1, 0);
+                                                                close(cliente);
+                                                                return -1;
+                                                            }
+                                                            else if(check==ERR_LOG)
+                                                            {
+                                                                strcpy(respuesta,"Usuario ya está en un log. Se aborta este intento de ingreso al log\n");
+                                                                send(cliente, respuesta, strlen(respuesta)+1, 0);
+                                                                break;
+                                                            }
+                                                            else
+                                                            {
+                                                                switch(opjug)
+                                                                {
+                                                                    case 1:
+                                                                        if(opflor=='S')
+                                                                        {
+                                                                            strcpy(respuesta,"Usuario logueado\nModalidad: con flor\tJugadores por equipo: 1\n");
+                                                                            send(cliente, respuesta, strlen(respuesta)+1, 0);
+                                                                        }
+                                                                        else
+                                                                        {
+                                                                            strcpy(respuesta,"Usuario logueado\nModalidad: sin flor\tJugadores por equipo: 1\n");
+                                                                            send(cliente, respuesta, strlen(respuesta)+1, 0);
+                                                                        }
+                                                                        break;
+                                                                    case 2:
+                                                                        if(opflor=='S')
+                                                                        {
+                                                                            strcpy(respuesta,"Usuario logueado\nModalidad: con flor\tJugadores por equipo: 2\n");
+                                                                            send(cliente, respuesta, strlen(respuesta)+1, 0);
+                                                                        }
+                                                                        else
+                                                                        {
+                                                                            strcpy(respuesta,"Usuario logueado\nModalidad: sin flor\tJugadores por equipo: 2\n");
+                                                                            send(cliente, respuesta, strlen(respuesta)+1, 0);
+                                                                        }
+                                                                        break;
+                                                                    case 3:
+                                                                        if(opflor=='S')
+                                                                        {
+                                                                            strcpy(respuesta,"Usuario logueado\nModalidad: con flor\tJugadores por equipo: 3\n");
+                                                                            send(cliente, respuesta, strlen(respuesta)+1, 0);
+                                                                        }
+                                                                        else
+                                                                        {
+                                                                            strcpy(respuesta,"Usuario logueado\nModalidad: sin flor\tJugadores por equipo: 3\n");
+                                                                            send(cliente, respuesta, strlen(respuesta)+1, 0);
+                                                                        }
+                                                                        break;
+                                                                }
+                                                            }
                                                             break;
                                                         case 'P':
                                                             if(puntuaciones(&us,respuesta)==ERR_PUNT)
@@ -411,7 +516,8 @@ int main(void){
                                                             send(cliente, respuesta, strlen(respuesta)+1, 0);
                                                             break;
                                                         case 'D':
-                                                            strcpy(respuesta,"Cliente quiere desconectarse del log\n");
+                                                            salidalog(&us);
+                                                            strcpy(respuesta,"Se desconectó del log\n");
                                                             send(cliente, respuesta, strlen(respuesta)+1, 0);
                                                             break;
                                                         case 'S':

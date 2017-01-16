@@ -1,9 +1,13 @@
 #include "conexion.h"
 
+NODO *h;
+FILE *fp;
+
 int comprobarnombre(char *nom)
 {
-    NODO *h=NULL,*last=NULL;
-    NODO aux;
+    //NODO *h=NULL,*last=NULL;
+    NODO aux,*last=NULL;
+    h=NULL;
     if(CargarArchivo(PATH_REG,&h,&last)==ERR_FILE)
     {
         perror(PATH_REG);
@@ -29,8 +33,9 @@ int comprobarnombre(char *nom)
 
 int comprobarpass(DATO *usu)
 {
-    NODO *h=NULL,*last=NULL;
-    NODO aux;
+    //NODO *h=NULL,*last=NULL;
+    NODO aux,*last=NULL;
+    h=NULL;
     int res;
     if(CargarArchivo(PATH_REG,&h,&last)==ERR_FILE)
     {
@@ -90,7 +95,7 @@ int validarpass(char *pass)
 
 int registrar(DATO *usu)
 {
-    FILE *fp;
+    //FILE *fp;
     if((fp=fopen(PATH_REG,"a+b"))==NULL)
     {
         perror(PATH_REG);
@@ -104,9 +109,10 @@ int registrar(DATO *usu)
 
 int iniciarsesion(DATO *usu)
 {
-    FILE *fp;
-    NODO *h=NULL,*last=NULL;
-    NODO aux;
+    //FILE *fp;
+    //NODO *h=NULL,*last=NULL;
+    NODO aux,*last=NULL;
+    h=NULL;
     if(CargarArchivo(PATH_INSES,&h,&last)==ERR_FILE)
     {
         perror(PATH_INSES);
@@ -115,6 +121,7 @@ int iniciarsesion(DATO *usu)
     aux.dato=*usu;
     if(BuscarNodo(&h,&aux,&last,SOLOBUSCAR)==ENCONTRO)//Para evitar dos inicios de sesión al mismo tiempo de un mismo usuario
     {
+        BorrarLista(&h);
         return ERR_INSES;
     }
     BorrarLista(&h);
@@ -128,10 +135,120 @@ int iniciarsesion(DATO *usu)
     return 0;
 }
 
+int ingresolog(DATO *usu,char opflor,int opjug)
+{
+    //FILE *fp;
+    //NODO *h=NULL,*last=NULL;
+    NODO aux,*last=NULL;
+    h=NULL;
+    int i;
+    char *archivoslog[6]={LOGS1,LOGN1,LOGS2,LOGN2,LOGS3,LOGN3};
+    for(i=0;i<6;i++)
+    {
+    if(CargarArchivo(archivoslog[i],&h,&last)==ERR_FILE)
+    {
+        perror(archivoslog[i]);
+        return ERR_FILE;
+    }
+    aux.dato=*usu;
+    if(BuscarNodo(&h,&aux,&last,SOLOBUSCAR)==ENCONTRO)//Para evitar dos logs al mismo tiempo de un mismo usuario (debe haber uno solo y no debe aparecer en dos archivos al mismo tiempo)
+    {
+        BorrarLista(&h);
+        return ERR_LOG;
+    }
+    BorrarLista(&h);
+    last=NULL;
+    }
+    switch(opjug)
+    {
+        case 1:
+            if(opflor=='S')
+            {
+                if((fp=fopen(LOGS1,"a+b"))==NULL)
+                {
+                    perror(LOGS1);
+                    return ERR_FILE;
+                }
+            }
+            else
+            {
+                if((fp=fopen(LOGN1,"a+b"))==NULL)
+                {
+                    perror(LOGN1);
+                    return ERR_FILE;
+                }
+            }
+            break;
+        case 2:
+            if(opflor=='S')
+            {
+                if((fp=fopen(LOGS2,"a+b"))==NULL)
+                {
+                    perror(LOGS2);
+                    return ERR_FILE;
+                }
+            }
+            else
+            {
+                if((fp=fopen(LOGN2,"a+b"))==NULL)
+                {
+                    perror(LOGN2);
+                    return ERR_FILE;
+                }
+            }
+            break;
+        case 3:
+            if(opflor=='S')
+            {
+                if((fp=fopen(LOGS3,"a+b"))==NULL)
+                {
+                    perror(LOGS3);
+                    return ERR_FILE;
+                }
+            }
+            else
+            {
+                if((fp=fopen(LOGN3,"a+b"))==NULL)
+                {
+                    perror(LOGN3);
+                    return ERR_FILE;
+                }
+            }
+            break;
+    }
+    fwrite(usu,sizeof(DATO),1,fp);
+    fclose(fp);
+    return 0;
+}
+
+void salidalog(DATO *usu)
+{
+    //FILE *fp;
+    //NODO *h=NULL,*last=NULL;
+    NODO aux,*last=NULL;
+    h=NULL;
+    int i;
+    char *archivoslog[6]={LOGS1,LOGN1,LOGS2,LOGN2,LOGS3,LOGN3};
+    aux.dato=*usu;
+    for(i=0;i<6;i++)
+    {
+    if(CargarArchivo(archivoslog[i],&h,&last)==ERR_FILE)
+    {
+        perror(archivoslog[i]);
+        return;
+    }
+    BuscarNodo(&h,&aux,&last,BUSCARBORRAR);
+    GuardarLista(&h,archivoslog[i]);
+    BorrarLista(&h);
+    last=NULL;
+    }
+}
+
 void cerrarsesion(DATO *usu)
 {
-    NODO *h=NULL,*last=NULL;
-    NODO aux;
+    //NODO *h=NULL,*last=NULL;
+    NODO aux,*last=NULL;
+    h=NULL;
     if(CargarArchivo(PATH_INSES,&h,&last)==ERR_FILE)
     {
         perror(PATH_INSES);
@@ -140,12 +257,15 @@ void cerrarsesion(DATO *usu)
     aux.dato=*usu;
     BuscarNodo(&h,&aux,&last,BUSCARBORRAR);
     GuardarLista(&h,PATH_INSES);
+    BorrarLista(&h);
+    salidalog(usu);
 }
 
 int puntuaciones(DATO *usu,char *respuesta)
 {
-    NODO *h=NULL,*last=NULL,*aux2;
-    NODO aux;
+    //NODO *h=NULL,*last=NULL;
+    NODO aux,*last=NULL,*aux2;
+    h=NULL;
     char buffaux[11];
     int finses=NO,ftop10=NO,i,j;
     if(CargarArchivo(PATH_INSES,&h,&last)==ERR_FILE)
@@ -313,7 +433,7 @@ void OrdenarLista (NODO *h)
 
 int CargarArchivo (char *ruta,NODO **h,NODO **last)
 {
-    FILE *fp;
+    //FILE *fp;
     NODO *aux;
     DATO buffer;
     if((fp=fopen(ruta,"rb"))==NULL)
@@ -356,7 +476,7 @@ int CargarArchivo (char *ruta,NODO **h,NODO **last)
 int GuardarLista (NODO **p,char *ruta)
 {
     NODO *aux,*aux2;
-    FILE *fp;
+    //FILE *fp;
     if((fp=fopen(ruta,"w"))==NULL)//w o wt: texto; wb: binario
     {
       perror(ruta);

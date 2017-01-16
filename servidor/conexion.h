@@ -19,6 +19,7 @@
 #include <unistd.h>
 #include <sys/time.h>
 #include <sys/wait.h>
+#include <signal.h>
 
 
 //-------------
@@ -46,6 +47,7 @@
 #define ERR_LONGNOM -2
 #define ERR_FILE 99
 #define ERR_PUNT 5
+#define ERR_LOG 8
 #define FILEOK 0
 #define NULLCHAR '\0'
 #define SOLOBUSCAR 0
@@ -69,7 +71,12 @@
 #define PREGUNTA3 printf("¿Dato a cambiar?\n1: %s\n2: %s\n0: Salir\nOpción: ",DT1,DT2);
 #define ENCABEZADO "Usuario\tContraseña\tPuntos\t\n"
 #define PRINTENCABEZADO printf(ENCABEZADO)
-
+#define LOGS1 "trucoS1"
+#define LOGN1 "trucoN1"
+#define LOGS2 "trucoS2"
+#define LOGN2 "trucoN2"
+#define LOGS3 "trucoS3"
+#define LOGN3 "trucoN3"
 
 //-----------------
 //-- Estructuras --
@@ -112,6 +119,8 @@ int validarpass(char *pass);
 int registrar(DATO *usu);
 int iniciarsesion(DATO *usu);
 void cerrarsesion(DATO *usu);
+int ingresolog(DATO *usu,char opflor,int opjug);
+void salidalog(DATO *usu);
 int puntuaciones(DATO *usu,char *respuesta);
 void AgregarNodoAlFinal (NODO **h,NODO *aux,NODO **last);
 int BuscarNodo (NODO **h,NODO *aux,NODO **last,int instruccion);
@@ -127,5 +136,7 @@ void stringReverse (char* palabra);
 int CargarArchivo (char *ruta,NODO **h,NODO **last);
 int GuardarLista (NODO **p,char *ruta);
 void OrdenarLista (NODO *h);
+void siginthandler(int signal);
+void sigchldhandler(int signal);
 
 #endif
