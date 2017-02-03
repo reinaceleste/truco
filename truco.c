@@ -1,14 +1,14 @@
 /**
 ******************************************************
-*  \file main.c
+*  \file truco.c
 *  \brief TP Obligatorio
-* \details Juego de truco
+* \details Juego de truco (TrucoC)
 * Uso del make
-* - Compilar con make new o make tp4_7
+* - Compilar con make new o make truco
 * - Ejecutar o compilar y ejecutar en un paso com make run o simplemente make (luego de la ejecución se borrarán los archivos objeto y el ejecutable)
 * - Generar y abrir página web con documento Doxygen con make html
 * - Borrar web con make no_html
-* - Agregar archivos .c, Makefile y Doxyfile al repositorio con make svn
+* - Agregar archivos .c, Makefile y Doxyfile al repositorio con make git
 * \author Federico Ariel Marinzalda
 * \version 1.3
 * \date 12/12/2016
@@ -19,6 +19,20 @@
 #include<stdlib.h>
 #include<time.h>
 #include"prototipos.h"
+/**
+******************************************************
+*  \fn int main (int argc,char **argv)
+*  \brief Función principal del juego
+* \details Se inicia el juego si el segundo argumento es S o N y el tercero es 1, 2 ó 3
+* \n Luego de iniciado, por cada mano se generan aleatoriamente las cartas por jugador y comienza el juego desde el jugador que es mano
+* \n Si juegan 3 por equipo, habrá pica-pica a partir que un equipo consiga 5 puntos y hasta que un equipo consiga 25
+* \author Federico Ariel Marinzalda
+* \version 1.3
+* \date 12/12/2016
+* \param[in] argc Cantidad de argumentos. Deben ser 3 para jugar: el nombre del programa (./truco), el modo de juego (S para jugar con flor o N para jugar sin flor) y la cantidad de jugadores por equipo (de 1 a 3)
+* \param[in] argv Valor de los argumentos
+*
+*******************************************************/
 int main (int argc,char **argv)
 {
     unsigned char acciones[18][6];

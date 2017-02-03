@@ -1,7 +1,7 @@
 /**
 ******************************************************
 *  \file prototipos.h
-*  \brief Contiene los prototipos de las funciones, las constantes simbólicas, typedefs y estructuras utilizadas en el TP
+*  \brief Contiene los prototipos de las funciones, las constantes simbólicas, typedefs y estructuras utilizadas en esta parte del TPO
 * \author Federico Ariel Marinzalda
 * \version 1.2
 * \date 12/12/2016
@@ -10,6 +10,17 @@
 *******************************************************/
 
 //Typedef utilizados en el TP
+/**
+******************************************************
+*  \typedef unsigned char baraja_t
+*  \brief Tipo de dato creado para la generación de códigos numéricos asociados a cada carta
+* \details Los bastos van del 81 al 92, las copas del 121 al 132, las espadas van del 161 al 172 y los oros del 200 al 212 (se saltean los números terminados en 8 y 9), por lo que alcanza con usar unsigned char
+* \author Federico Ariel Marinzalda
+* \version 1.0
+* \date 12/12/2016
+*
+*
+*******************************************************/
 typedef unsigned char baraja_t;
 
 //Prototipos de funciones usadas en el TP
@@ -24,9 +35,6 @@ void juegamano (baraja_t(*)[10],baraja_t(*)[3],unsigned char(*)[6],unsigned char
 void informarmano (unsigned char,unsigned char,unsigned char,unsigned char,unsigned char,unsigned char,unsigned char*,unsigned char*);
 void informarpicapica (unsigned char,unsigned char,unsigned char*,unsigned char*);
 int myStrlen (const char*);
-int myStrncpy (char* dest,char* origen,int n);
-int myStrnlastcpy (char* dest,char* origen,int n);
-int myStrcencpy (char* dest,char* origen,int n,int m);
 
 //Constantes simbólicas usadas en el TP
 #define BASTO 2

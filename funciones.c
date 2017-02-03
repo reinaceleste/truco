@@ -461,7 +461,7 @@ void inicializarmano (char *tantoenvido,char *tantoflor,char *penalizacionflor,c
 
 /**
 ******************************************************
-*  \fn void informarcartas(unsigned char mostrarcartas,unsigned char(*cartasrepartidas)[3],unsigned char hayflor,unsigned char mano)
+*  \fn void informarcartas(unsigned char mostrarcartas,unsigned char(*cartasrepartidas)[3],unsigned char hayflor,unsigned char mano,char *tantoenvido,char *tantoflor)
 *  \brief Función que informa las cartas y los tantos de un jugador
 * \author Federico Ariel Marinzalda
 * \version 1.0
@@ -2343,88 +2343,3 @@ int myStrlen (const char* palabra)
   return i;
 }
 
-/**
-******************************************************
-*  \fn int myStrncpy (char* dest,char* origen,int n)
-*  \brief Función que copia los primeros n caracteres de una palabra a otro string
-* \author Federico Ariel Marinzalda
-* \version 1.0
-* \date 25/8/2016
-* \param [in] *dest Dirección del string al que se envía la palabra
-* \param [in] *origen Dirección del string del que proviene la palabra
-* \param [in] n Cantidad de caracteres a copiar
-* \param [out] -1 En caso de error en la copia
-* \param [out] 0 En caso de copia realizada correctamente
-* \returns Devuelve número entero
-*******************************************************/
-int myStrncpy (char* dest,char* origen,int n)
-{
-  int i;
-  if(dest==NULL || n<1)
-      return -1;
-  for(i=0;i<n && *(origen+i)!=NULLCHAR;i++)
-      *(dest+i)=*(origen+i);
-  *(dest+i)=NULLCHAR;
-  return 0;
-}
-
-/**
-******************************************************
-*  \fn int myStrnlastcpy (char* dest,char* origen,int n)
-*  \brief Función que copia los últimos n caracteres de una palabra a otro string
-* \author Federico Ariel Marinzalda
-* \version 1.0
-* \date 25/8/2016
-* \param [in] *dest Dirección del string al que se envía la palabra
-* \param [in] *origen Dirección del string del que proviene la palabra
-* \param [in] n Cantidad de caracteres a copiar
-* \param [out] -1 En caso de error en la copia
-* \param [out] 0 En caso de copia realizada correctamente
-* \returns Devuelve número entero
-*******************************************************/
-int myStrnlastcpy (char* dest,char* origen,int n)
-{
-  int i,l;
-  if(dest==NULL || n<1)
-      return -1;
-  l=myStrlen(origen);
-  if(l<=n)
-  {
-      for(i=0;i<l;i++)
-          *(dest+i)=*(origen+i);
-  }
-  else
-  {
-      for(i=0;i<n;i++)
-          *(dest+i)=*(origen+(l-n+i));
-  }
-  *(dest+i)=NULLCHAR;
-  return 0;
-}
-
-/**
-******************************************************
-*  \fn int myStrcencpy (char* dest,char* origen,int n,int m)
-*  \brief Función que copia los caracteres centrales de una palabra a otro string (no copia ni los n primeros ni los m últimos)
-* \author Federico Ariel Marinzalda
-* \version 1.0
-* \date 25/8/2016
-* \param [in] *dest Dirección del string al que se envía la palabra
-* \param [in] *origen Dirección del string del que proviene la palabra
-* \param [in] n Cantidad de primeros caracteres que no se desean copiar
-* \param [in] m Cantidad de últimos caracteres que no se desean copiar
-* \param [out] control -1 En caso de error en la copia, 0 En caso de copia realizada correctamente
-* \returns Devuelve número entero
-*******************************************************/
-int myStrcencpy (char* dest,char* origen,int n,int m)
-{
-  int l,control;
-  l=myStrlen(origen);
-  if(dest==NULL || n+m>l || n<0 || m<0)
-      return -1;
-  control=myStrncpy(dest,origen,l-m);
-  if(control==-1)
-      return control;
-  control=myStrnlastcpy(dest,dest,l-m-n);
-  return control;
-}
