@@ -1,6 +1,6 @@
 /**
 ******************************************************
-*  \file truco.c
+*  \file main.c
 *  \brief TP Obligatorio
 * \details Cliente
 * Uso del make
