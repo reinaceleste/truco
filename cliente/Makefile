@@ -6,24 +6,14 @@ CFLAGS=-c
 LDFLAGS=
 ARCHIVO=client
 PARTE=cliente
-RUTA=Branches/tp4/4_7
-ADD=--force *.c *.h Makefile Doxyfile
 LOGFILE=$(LOGPATH)$(shell date +'%d/%m')
 MODIF=
 HEADERS=*.h
-OBJS=truco.o funciones.o
+OBJS=main.o datos_server.o gets_s.o login.o otrasfunc.o
 
 run: $(ARCHIVO)
-	@while [ -z "$$mod" ]; do \
-	read -r -p "Ingrese modo de juego (presione S para jugar con flor o N para jugar sin flor): " mod; \
-	done ;  \
-	[ $$mod = "S" ] || [ $$mod = "N" ] || (echo "Opción incorrecta\nBorrando archivos objeto ..."; rm -f *.o; echo "Archivos objeto eliminados\n"; killall make;); \
-	while [ -z "$$jug" ]; do \
-	read -r -p "Ingrese cantidad de jugadores por equipo (hasta 3): " jug; \
-	done ; \
-	[ $$jug = "1" ] || [ $$jug = "2" ] || [ $$jug = "3" ] || (echo "Cantidad de jugadores incorrecta\nBorrando archivos objeto ..."; rm -f *.o; echo "Archivos objeto eliminados\n"; killall make;); \
-	echo "Puede jugar"; \
-	./$(ARCHIVO) $$mod $$jug
+	@echo "\nEjecutando archivo ..."
+	./$(ARCHIVO)
 	@echo "\nEjecución terminada. Presione cualquier tecla para continuar"
 	@read tecla
 	@echo "\nBorrando archivos objeto ..."

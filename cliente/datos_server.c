@@ -1,8 +1,8 @@
 /**
 *	\file datos_server.c
-*	\fn void datos_server(struct datos*)
-*	\brief Función que carga del archivo config.txt los datos de ip y puerto del servidor.
-*	\param struct datos* puntero a los datos del servidor.
+*	\brief Archivo con función para obtener datos del servidor
+* \version 1.0
+* \date 21/11/2016
 */
 
 //--------------
@@ -11,6 +11,14 @@
 
 #include "conexion.h"
 
+/**
+*	\fn void datos_server(struct datos*)
+*	\brief Función que carga del archivo config.txt los datos de ip y puerto del servidor.
+* \author Reina Celeste Chaves
+* \version 1.0
+* \date 21/11/2016
+*	\param[in] configuración puntero a los datos del servidor.
+*/
 //---------------
 //--  Defines  --
 //---------------

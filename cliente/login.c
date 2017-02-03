@@ -1,8 +1,8 @@
 /**
 *	\file login.c
-*	\fn int login(void)
-*	\brief Función de logueo al servidor
-*	\return Retorna el socket si se conecto o errores.
+*	\brief Archivo con la función de logueo al servidor
+* \version 1.0
+* \date 21/11/2016
 */
 
 //--------------
@@ -10,14 +10,20 @@
 //--------------
 
 #include "conexion.h"
-
+/**
+*	\fn int login(void)
+*	\brief Función de logueo al servidor
+* \version 1.0
+* \date 21/11/2016 
+* \param[out] sockfd_cliente Socket del cliente que se conecta (toma valor -1 en caso de error)
+*	\return Un número entero
+*/
 
 int login(void){
      
 	int sockfd_cliente;                    
     struct sockaddr_in datosServer;     
-    struct datos configuracion;      
-    int nBytes;                           
+    struct datos configuracion;                       
         
     sockfd_cliente = socket(AF_INET,SOCK_STREAM,0);  
     if(sockfd_cliente == -1){

@@ -1,7 +1,9 @@
 /**
  *	\file conexion.h
- *	\brief Prototipos de funciones conexion.
- *	\brief Defines y prototipos de las funciones sobre conexion.
+ *	\brief Contiene los prototipos de las funciones, las constantes simbólicas, typedefs y estructuras utilizadas en esta parte del TPO
+* \author Reina Celeste Chaves y Federico Ariel Marinzalda
+* \version 1.2
+* \date 4/1/2017
  */
  
 #ifndef CONEXION_H
@@ -39,15 +41,33 @@
 #define JUGANDO 4
 #define SI 1
 #define NO 0
+#define MAX_NOM 50
+#define MAX_REP 1000
 
 //-----------------
 //-- Estructuras --
 //-----------------
 
+/**
+ *	\struct datos
+ *	\brief Datos del servidor
+ * \details Dirección IP (vector de chars) y Puerto (entero)
+* \author Reina Celeste Chaves
+* \version 1.0
+* \date 21/11/2016
+ */
 struct datos{  
      char ip[MAX_IP];
      int  puerto;
 };
+/**
+ *	\struct usuario
+ *	\brief Datos del usuario
+ * \details Nombre de usuario y contraseña (ambos son vectores de chars)
+* \author Federico Marinzalda
+* \version 1.1
+* \date 22/12/2016
+ */
 struct usuario{
     char user[MAX_USER+1];
     char password[MAX_PASS+1];

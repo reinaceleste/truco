@@ -1,17 +1,34 @@
 /**
-*	\file main.c
-*	\fn int main(void)
-*	\brief Función principal del cliente
- *	\author Federico Ariel Marinzalda
- *	\date 5/1/2017
-*	\version 1.4
-*/
+******************************************************
+*  \file truco.c
+*  \brief TP Obligatorio
+* \details Cliente
+* Uso del make
+* - Compilar con make new o make cliente
+* - Ejecutar o compilar y ejecutar en un paso com make run o simplemente make (luego de la ejecución se borrarán los archivos objeto y el ejecutable)
+* - Generar y abrir página web con documento Doxygen con make html
+* - Borrar web con make no_html
+* - Agregar archivos .c, Makefile y Doxyfile al repositorio con make git
+* \author Federico Ariel Marinzalda
+* \version 1.4
+* \date 5/1/2017
+*
+*
+*******************************************************/
 
 
 #include "conexion.h"
+/**
+******************************************************
+*  \fn int main(void)
+*  \brief Función principal del cliente
+* \details Puede elegir entre varias opciones (registrarse, iniciar sesión, jugar, ver puntuaciones, cerrar sesión)
+* \author Federico Ariel Marinzalda
+* \version 1.4
+* \date 5/1/2017
+*
+*******************************************************/
 
-#define MAX_NOM 50
-#define MAX_REP 1000
 
 int main(void){
     

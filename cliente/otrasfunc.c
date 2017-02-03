@@ -1,3 +1,10 @@
+/**
+*	\file otrasfunc.c
+*	\brief Archivo con otras funciones utilizadas en la parte del cliente del TPO
+* \version 1.0
+* \date 4/1/2017
+*/
+
 #include "conexion.h"
 
 /**
