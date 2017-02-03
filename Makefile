@@ -6,7 +6,6 @@ CFLAGS=-c
 LDFLAGS=
 ARCHIVO=truco
 PARTE=jugabilidad
-ADD=--force *.c *.h Makefile Doxyfile
 LOGFILE=$(LOGPATH)$(shell date +'%d/%m')
 MODIF=
 HEADERS=*.h
