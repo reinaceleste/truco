@@ -1,11 +1,12 @@
-#Makefile del TPO - - TrucoC - Juego
+#Makefile del TPO - - TrucoC - Cliente
 #Los comandos que empiezan con @ no se muestran al ejecutar su correspondiente regla make
 
 CC=gcc -Wall
 CFLAGS=-c
 LDFLAGS=
-ARCHIVO=truco
-PARTE=jugabilidad
+ARCHIVO=client
+PARTE=cliente
+RUTA=Branches/tp4/4_7
 ADD=--force *.c *.h Makefile Doxyfile
 LOGFILE=$(LOGPATH)$(shell date +'%d/%m')
 MODIF=

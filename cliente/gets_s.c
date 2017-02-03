@@ -1,10 +1,4 @@
-/**
- * \fn char *gets_s(char *s, int size)
- * \brief Obtención de una string de stdin sin un newline final. Versión segura de gets
- * \param s Buffer de destino al cuál leer la string
- * \param size Tamaño máximo a leer
- * \return Retorna el puntero de la string leída
- */
+
 
 //--------------
 //-- Includes --

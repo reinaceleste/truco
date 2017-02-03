@@ -7,9 +7,6 @@
 *	\version 1.4
 */
 
-//--------------
-//-- Includes --
-//--------------
 
 #include "conexion.h"
 
