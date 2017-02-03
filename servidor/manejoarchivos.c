@@ -1,8 +1,42 @@
+/**
+*	\file manejoarchivos.c
+*	\brief Archivo con funciones varias utilizadas en esta parte del TPO
+* \version 1.0
+* \date 5/1/2017
+*/
+
 #include "conexion.h"
 
+/**
+******************************************************
+*  \var *h
+*  \brief Puntero a NODO que guarda la dirección de inicio de una lista
+* \details Debe ser global para que, al llegar una señal de interrupción, se utiliza este puntero para borrar la lista de recursos pedidos con malloc (si h no es NULL)
+*
+*******************************************************/
 NODO *h;
+/**
+******************************************************
+*  \var *fp
+*  \brief Puntero a FILE
+* \details Debe ser global para que, al llegar una señal de interrupción, se utiliza este puntero para cerrar adecuadamente el archivo
+*
+*******************************************************/
 FILE *fp;
 
+/**
+******************************************************
+*  \fn int comprobarnombre(char *nom)
+*  \brief Función que comprueba el nombre de usuario entre todos los registrados
+* \author Federico Ariel Marinzalda
+* \version 1.0
+* \date 5/1/2017
+* \param [in] *nom Nombre del usuario
+* \returns Un número entero
+* \details Valores posibles:
+* - 0 en caso de exito
+* - Mayor a 0 en caso de error
+*******************************************************/
 int comprobarnombre(char *nom)
 {
     //NODO *h=NULL,*last=NULL;
@@ -31,6 +65,17 @@ int comprobarnombre(char *nom)
     }
 }
 
+/**
+******************************************************
+*  \fn int comprobarpass(DATO *usu)
+*  \brief Función que comprueba la contraseña del usuario
+* \author Federico Ariel Marinzalda
+* \version 1.0
+* \date 5/1/2017
+* \param [in] *usu Puntero a DATO que guarda la dirección de comienzo de los datos del usuario
+* \param [out] res Resultado de la comprobación
+* \returns Un número entero
+*******************************************************/
 int comprobarpass(DATO *usu)
 {
     //NODO *h=NULL,*last=NULL;
@@ -48,6 +93,19 @@ int comprobarpass(DATO *usu)
     return res;
 }
 
+/**
+******************************************************
+*  \fn int validarpass(char *pass)
+*  \brief Función que verifica que la contraseña ingresada sea válida (debe tener mayúsculas, minúsculas y números y debe ser de entre 8 y 16 caracteres)
+* \author Federico Ariel Marinzalda
+* \version 1.0
+* \date 5/1/2017
+* \param [in] *pass Contraseña a verificar
+* \returns Un número entero
+* \details Valores posibles:
+* - 0 en caso de exito
+* - Mayor a 0 en caso de error
+*******************************************************/
 int validarpass(char *pass)
 {
     int i,l,fmayus=0,fminus=0,fnum=0;
@@ -93,6 +151,16 @@ int validarpass(char *pass)
     return 0;
 }
 
+/**
+******************************************************
+*  \fn int registrar(DATO *usu)
+*  \brief Función que registra a un nuevo usuario al archivo
+* \author Federico Ariel Marinzalda
+* \version 1.0
+* \date 5/1/2017
+* \param [in] *usu Puntero a DATO que guarda la dirección de comienzo de los datos del usuario
+* \returns 0 en caso de éxito, distinto de 0 en caso de error
+*******************************************************/
 int registrar(DATO *usu)
 {
     //FILE *fp;
@@ -107,6 +175,16 @@ int registrar(DATO *usu)
     return 0;
 }
 
+/**
+******************************************************
+*  \fn int iniciarsesion(DATO *usu)
+*  \brief Función que se encarga de realizar y registrar el inicio de sesión de un usuario
+* \author Federico Ariel Marinzalda
+* \version 1.0
+* \date 5/1/2017
+* \param [in] *usu Puntero a DATO que guarda la dirección de comienzo de los datos del usuario
+* \returns 0 en caso de éxito, distinto de 0 en caso de error
+*******************************************************/
 int iniciarsesion(DATO *usu)
 {
     //FILE *fp;
@@ -135,6 +213,18 @@ int iniciarsesion(DATO *usu)
     return 0;
 }
 
+/**
+******************************************************
+*  \fn int ingresolog(DATO *usu,char opflor,int opjug)
+*  \brief Función que se encarga de realizar y registrar el modo de juego elegido por el usuario y registrarlo en el log correspondiente
+* \author Federico Ariel Marinzalda
+* \version 1.0
+* \date 5/1/2017
+* \param [in] *usu Puntero a DATO que guarda la dirección de comienzo de los datos del usuario
+* \param [in] opflor Modo de juego elegido (S para jugar con flor, N para jugar sin flor)
+* \param [in] opjug Cantidad de jugadores por equipo elegida (de 1 a 3)
+* \returns 0 en caso de éxito, distinto de 0 en caso de error
+*******************************************************/
 int ingresolog(DATO *usu,char opflor,int opjug)
 {
     //FILE *fp;
@@ -221,6 +311,15 @@ int ingresolog(DATO *usu,char opflor,int opjug)
     return 0;
 }
 
+/**
+******************************************************
+*  \fn void salidalog(DATO *usu)
+*  \brief Función que se encarga de realizar la salida del log del usuario
+* \author Federico Ariel Marinzalda
+* \version 1.0
+* \date 5/1/2017
+* \param [in] *usu Puntero a DATO que guarda la dirección de comienzo de los datos del usuario
+*******************************************************/
 void salidalog(DATO *usu)
 {
     //FILE *fp;
@@ -244,6 +343,15 @@ void salidalog(DATO *usu)
     }
 }
 
+/**
+******************************************************
+*  \fn void cerrarsesion(DATO *usu)
+*  \brief Función que se encarga de realizar el cierre de sesión del usuario
+* \author Federico Ariel Marinzalda
+* \version 1.0
+* \date 5/1/2017
+* \param [in] *usu Puntero a DATO que guarda la dirección de comienzo de los datos del usuario
+*******************************************************/
 void cerrarsesion(DATO *usu)
 {
     //NODO *h=NULL,*last=NULL;
@@ -261,6 +369,17 @@ void cerrarsesion(DATO *usu)
     salidalog(usu);
 }
 
+/**
+******************************************************
+*  \fn int puntuaciones(DATO *usu,char *respuesta)
+*  \brief Función que se encarga de preparar la tabla de posiciones para informarla al usuario
+* \author Federico Ariel Marinzalda
+* \version 1.0
+* \date 5/1/2017
+* \param [in] *usu Puntero a DATO que guarda la dirección de comienzo de los datos del usuario
+* \param [in] *respuesta Dirección de comienzo del buffer en el que se guardará la respuesta
+* \returns 0 en caso de éxito, distinto de 0 en caso de error
+*******************************************************/
 int puntuaciones(DATO *usu,char *respuesta)
 {
     //NODO *h=NULL,*last=NULL;
@@ -360,6 +479,17 @@ int puntuaciones(DATO *usu,char *respuesta)
     return 0;
 }
 
+/**
+******************************************************
+*  \fn void mydectostr (int num,char *buf)
+*  \brief Función que convierte un entero en una cadena de caracteres
+* \author Federico Ariel Marinzalda
+* \version 1.0
+* \date 5/1/2017
+* \param [in] num Número a convertir
+* \param [in] *buf Dirección de comienzo del buffer en el que se guardará la conversión
+* \returns 0 en caso de éxito, distinto de 0 en caso de error
+*******************************************************/
 void mydectostr (int num,char *buf)
 {
     int i;
@@ -431,6 +561,18 @@ void OrdenarLista (NODO *h)
     } while (marca);
 }
 
+/**
+******************************************************
+*  \fn int CargarArchivo (char *ruta,NODO **h,NODO **last)
+*  \brief Función que lee un archivo y forma una lista
+* \author Federico Ariel Marinzalda
+* \version 1.0
+* \date 1/11/2016
+* \param [in] *ruta Nombre del archivo donde se guardan los datos
+* \param [in] **h Inicio de la lista
+* \param [in] **last Fin de la lista
+* \returns 0 en caso de éxito, distinto de 0 en caso de error
+*******************************************************/
 int CargarArchivo (char *ruta,NODO **h,NODO **last)
 {
     //FILE *fp;
@@ -504,6 +646,7 @@ int GuardarLista (NODO **p,char *ruta)
 * \date 19/11/2016
 * \param [in] **h Dirección de inicio de la lista
 * \param [in] *aux Dirección del nodo a agregar/buscar
+* \param [in] **last Dirección de fin de la lista
 *******************************************************/
 void BuscarAgregarNodoAlFinal (NODO **h,NODO *aux,NODO **last)
 {
@@ -616,6 +759,17 @@ int BuscarNodo (NODO **h,NODO *aux,NODO **last,int instruccion)
   return NOENCONTRO;
 }
 
+/**
+******************************************************
+*  \fn void AgregarNodoAlFinal (NODO **h,NODO *aux,NODO **last)
+*  \brief Función que busca un nodo y lo agrega si no lo encuentra
+* \author Federico Ariel Marinzalda
+* \version 1.0
+* \date 19/11/2016
+* \param [in] **h Dirección de inicio de la lista
+* \param [in] *aux Dirección del nodo a agregar/buscar
+* \param [in] **h Dirección de fin de la lista
+*******************************************************/
 void AgregarNodoAlFinal (NODO **h,NODO *aux,NODO **last)
 {
   if(*h==NULL)
@@ -629,6 +783,15 @@ void AgregarNodoAlFinal (NODO **h,NODO *aux,NODO **last)
   *last=aux;
 }
 
+/**
+******************************************************
+*  \fn void BorrarLista (NODO **p)
+*  \brief Función que borra toda una lista
+* \author Federico Ariel Marinzalda
+* \version 1.1
+* \date 2/1/2017
+* \param [in] **p Dirección de inicio de la lista
+*******************************************************/
 void BorrarLista (NODO **p)
 {
     NODO *aux,*aux2;

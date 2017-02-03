@@ -1,10 +1,20 @@
 /**
- *	\file main.c
- *	\fn int main(void)
- *	\brief Función principal del servidor.
- *	\author Chaves, Reina Celeste
- *	\return Retorna 0.
- */
+******************************************************
+*  \file main.c
+*  \brief TP Obligatorio
+* \details Servidor
+* Uso del make
+* - Compilar con make new o make server
+* - Ejecutar o compilar y ejecutar en un paso com make run o simplemente make (luego de la ejecución se borrarán los archivos objeto y el ejecutable)
+* - Generar y abrir página web con documento Doxygen con make html
+* - Borrar web con make no_html
+* - Agregar archivos .c, Makefile y Doxyfile al repositorio con make git
+* \author Federico Ariel Marinzalda
+* \version 1.4
+* \date 5/1/2017
+*
+*
+*******************************************************/
 
 //--------------
 //-- Includes --
@@ -17,26 +27,49 @@
 //--  Defines  --
 //---------------
 
-#define MAX_DATOS 1000
 
+/**
+******************************************************
+*  \var listener
+*  \brief Variable entera que guarda al socket que se abre al iniciar el servidor (es el que espera la conexión de un cliente)
+* \details Debe ser global para que, al llegar una señal de interrupción, cerrar debidamente este socket en el handler asociado
+*
+*******************************************************/
 int listener;                      	    //Socket que recibe las conexiones.
+/**
+******************************************************
+*  \var cliente
+*  \brief Variable entera que guarda al socket que se abre al aceptar la conexión de un cliente
+* \details Debe ser global para que, al llegar una señal de interrupción, cerrar debidamente este socket en el handler asociado
+*
+*******************************************************/
 int cliente;                           //cliente que se conecta.
 
+/**
+******************************************************
+*  \fn int main(void)
+*  \brief Función principal del servidor
+* \details Espera a un cliente y, cuando se conecta uno, se crea un proceso hijo con otro socket el cual lo atiende, mientras que el padre espera a otro cliente
+* \author Federico Ariel Marinzalda
+* \version 1.4
+* \date 5/1/2017
+*
+*******************************************************/
 int main(void){
      
     //int listener;                      	    //Socket que recibe las conexiones.
     //int cliente;                           //cliente que se conecta.
     struct sockaddr_in datosServer;       //Datos del servidor.
     struct sockaddr_in datosCliente;     //Datos del cliente.
-    int clienteConectado;               //Flag que indica que el cliente se conecto.
-    fd_set master;                     //Conjunto maestro de descriptores de fichero.
-    fd_set readset;                   //Conjunto temporal de descriptores de fichero para select()
-    int fdmax;                       //Número mayor descriptor de fichero.
-    int i;                          //Para el for del select.
-    int on = 1;                    //Necesario para setsockopt (setear las opciones del socket).
+    //int clienteConectado;               //Flag que indica que el cliente se conecto.
+    //fd_set master;                     //Conjunto maestro de descriptores de fichero.
+    //fd_set readset;                   //Conjunto temporal de descriptores de fichero para select()
+    //int fdmax;                       //Número mayor descriptor de fichero.
+    //int i;                          //Para el for del select.
+    //int on = 1;                    //Necesario para setsockopt (setear las opciones del socket).
     socklen_t addrlen;                  //Necesito para el accept.
     struct datos configuracion;  //IP y PUERTO del servidor.
-    int nbytes;					//Respuesta del servidor			    
+    //int nbytes;					//Respuesta del servidor			    
     char respuesta[MAX_DATOS]; //Respuesta del servidor como que el cliente se conecto.
     struct usuario us;
     pid_t pid;

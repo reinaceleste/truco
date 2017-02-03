@@ -1,12 +1,4 @@
-/**
- *	\file recibir.c
- *	\fn int recibir(int socket, char *buffer, int tamaño, FD_SET *master)
- *	\brief Función recv que valida si no es 0 o menor.
- *	\param socket flujo de datos a revisar.
- *  \param buffer contenedor de información.
- *	\param tamano tamaño del buffer
- *	\return nbytes cantidad de bytes recibidos.
-*/
+
 
 //--------------
 //-- Includes --

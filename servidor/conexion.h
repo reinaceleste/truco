@@ -77,23 +77,70 @@
 #define LOGN2 "trucoN2"
 #define LOGS3 "trucoS3"
 #define LOGN3 "trucoN3"
+#define MAX_DATOS 1000
 
 //-----------------
 //-- Estructuras --
 //-----------------
 
+/**
+ *	\struct datos
+ *	\brief Datos del servidor
+ * \details Dirección IP (vector de chars) y Puerto (entero)
+* \author Reina Celeste Chaves
+* \version 1.0
+* \date 21/11/2016
+ */
 struct datos{
      
      char ip[MAX_IP];
      int  puerto;
 };
 
+/**
+ *	\struct usuario
+ *	\brief Datos del usuario
+ * \details Nombre de usuario, contraseña (ambos son vectores de chars) y puntos acumulados (entero)
+* \author Federico Marinzalda
+* \version 1.1
+* \date 22/12/2016
+ */
+/**
+******************************************************
+*  \typedef struct usuario DATO
+*  \brief Typedef que sirve como alias de la estructura creada usuario
+* \details Se crea el alias ya que el mismo se utiliza en varios prototipos de funciones de manejo de archivos y listas
+* \author Federico Ariel Marinzalda
+* \version 1.1
+* \date 22/12/2016
+*
+*
+*******************************************************/
 typedef struct usuario{
     char user[MAX_USER+1];
     char password[MAX_PASS+1];
     int puntos;
 } DATO;
 
+/**
+ *	\struct nodo
+ *	\brief Creación del nodo para ser utilizado en listas
+ * \details Dato (Estructura usuario) y dirección del siguiente nodo de la lista (Puntero a la estructura nodo)
+* \author Federico Marinzalda
+* \version 1.1
+* \date 22/12/2016
+ */
+/**
+******************************************************
+*  \typedef struct usuario NODO
+*  \brief Typedef que sirve como alias de la estructura creada nodo
+* \details Se crea el alias ya que el mismo se utiliza en varios prototipos de funciones de manejo de archivos y listas
+* \author Federico Ariel Marinzalda
+* \version 1.0
+* \date 22/12/2016
+*
+*
+*******************************************************/
 typedef struct nodo
 {
     DATO dato;
