@@ -7,7 +7,7 @@ LDFLAGS=`allegro-config --libs`
 ARCHIVO=clientui
 PARTE=interfaz gráfica del cliente
 LOGFILE=$(LOGPATH)$(shell date +'%d/%m')
-MODIF= Pruebas del menú, ingreso y salida de texto
+MODIF=. Submenú de Registro finalizado.
 HEADERS=*.h
 OBJS=codigograf.o
 
@@ -49,5 +49,5 @@ no_html:
 	@echo "Para volver a crearla, escribir make html\n"
 git:
 	git add .
-	git commit -m "Avances en $(PARTE) al $(LOGFILE).$(MODIF)"
+	git commit -m "Avances en $(PARTE) al $(LOGFILE)$(MODIF)"
 	git push

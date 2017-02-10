@@ -27,6 +27,9 @@
 #define NULLCHAR '\0'
 #define MAX_LONG 46
 #define MAX_REP 1000
+#define MAX_RENG 6
+#define MAX_USER 40
+#define MAX_PASS 24
 #define mouse_en_opciones mouse_x>=470&&((mouse_y>=190&&mouse_y<=230)||(mouse_y>=250&&mouse_y<=290)||(mouse_y>=310&&mouse_y<=350)||(mouse_y>=360&&mouse_y<=400)||(mouse_y>=410&&mouse_y<=450))
 #define mouse_y_regis mouse_y>=190&&mouse_y<=230
 #define mouse_y_inic mouse_y>=250&&mouse_y<=290
@@ -35,6 +38,20 @@
 #define mouse_y_salir mouse_y>=410&&mouse_y<=450
 #define mouse_en_volver mouse_x>=480&&mouse_x<=550&&mouse_y>=410&&mouse_y<=450
 
+/**
+ *	\struct usuario
+ *	\brief Datos del usuario
+ * \details Nombre de usuario y contraseña (ambos son vectores de chars)
+* \author Federico Marinzalda
+* \version 1.1
+* \date 22/12/2016
+ */
+struct usuario{
+    char user[MAX_USER+1];
+    char password[MAX_PASS+1];
+};
+
 void abort_on_error(const char *message);
 int my_strlen (char* palabra);
 int myStrncpy (char* dest,char* origen,int n);
+int myStrncmp (const char* s1,const char* s2,int n);

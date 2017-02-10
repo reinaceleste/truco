@@ -10,8 +10,8 @@
 * - Borrar web con make no_html
 * - Agregar archivos .c, Makefile y Doxyfile al repositorio con make git
 * \author Federico Ariel Marinzalda
-* \version 1.0
-* \date 7/2/2017
+* \version 1.4
+* \date 10/2/2017
 *
 *
 *******************************************************/
@@ -28,8 +28,8 @@
 * \details Se crea una ventana a partir de imagenes bmp
 * \n En terminal, compilar con gcc -o clientui codigograf.c -Wall `allegro-config --libs`
 * \author Federico Ariel Marinzalda
-* \version 1.0
-* \date 7/2/2017
+* \version 2.3
+* \date 10/2/2017
 *
 *******************************************************/
 
@@ -38,10 +38,12 @@ int main()
     BITMAP *portada,*portadaregis,*portadainic,*portadajugar,*portadalideres,*portadasalir,*portadavolver1,*portadavolver2;
     BITMAP *buffer,*cursor;
     FONT *font;
-    char salir=NO,opcion=NO,chartostr[2]={0},palabra[MAX_LONG]={0},limpiobuf=NO,encabezado[MAX_REP];
-    //int i;
+    char salir=NO,opcion=NO,chartostr[2]={0},palabra[MAX_LONG]={0},limpiobuf=NO,encabezado[MAX_RENG][MAX_REP],errorpass=NO,buffpass[MAX_LONG]={0};
+    //char buffuser[MAX_LONG];
+    int i,y;
     //int tecla;
     int cantenters;
+    struct usuario us;
     if(allegro_init())
     {
         abort_on_error("No se puede inicializar la biblioteca allegro\n");
@@ -106,6 +108,10 @@ int main()
     }
     while(salir==NO)
     {
+        for(i=0;i<MAX_RENG;i++)
+        {
+            strcpy(encabezado[i],"NULL");
+        }
         if(opcion==NO)
         {
             cantenters=0;
@@ -188,17 +194,51 @@ int main()
             switch(opcion)
             {
                 case REG:
-                    //textout_centre_ex(buffer,font,"Ingrese nombre de usuario",ANCHO/2,ALTO/4,makecol(238,187,136),makecol(0,0,0));
                     switch(cantenters)
                     {
                         case 0:
-                            strcpy(encabezado,"Ingrese su nombre de usuario");
+                            strcpy(encabezado[0],"Ingrese su nombre de usuario");
+                            strcpy(encabezado[1],"Luego presione enter");
                             break;
                         case 1:
-                            strcpy(encabezado,"Ingrese su contraseña");
+                            strcpy(encabezado[0],"Ingrese su contrasena");
+                            strcpy(encabezado[1],"Luego presione enter");
                             break;
                         case 2:
-                            strcpy(encabezado,"Confirmar contraseña");
+                            if(errorpass==NO)
+                            {
+                                strcpy(encabezado[0],"Confirmar su contrasena");
+                                strcpy(encabezado[1],"Luego presione enter");
+                            }
+                            else
+                            {
+                                strcpy(encabezado[0],"Contrasena no coincide");
+                                strcpy(encabezado[1],"Confirmar su contrasena");
+                                strcpy(encabezado[2],"Luego presione enter");
+                            }
+                            break;
+                        case 3:
+                            if(myStrncmp(us.password,buffpass,my_strlen(us.password)+1)==0)
+                            {
+                                strcpy(encabezado[0],"Usuario registrado: ");
+                                strcat(encabezado[0],us.user);
+                                strcpy(encabezado[1],"Contrasena: ");
+                                for(i=0;i<my_strlen(us.password);i++)
+                                {
+                                    strcat(encabezado[1],"*");
+                                }
+                                strcpy(encabezado[2],"Presione enter o haga clic en volver");
+                                errorpass=NO;
+                                if(keypressed())
+                                {
+                                    cantenters++;
+                                }
+                            }
+                            else
+                            {
+                                cantenters=2;
+                                errorpass=SI;
+                            }
                             break;
                         default:
                             cantenters=0;
@@ -212,10 +252,10 @@ int main()
                     switch(cantenters)
                     {
                         case 0:
-                            strcpy(encabezado,"Ingrese su nombre de usuario");
+                            strcpy(encabezado[0],"Ingrese su nombre de usuario");
                             break;
                         case 1:
-                            strcpy(encabezado,"Ingrese su contraseña");
+                            strcpy(encabezado[0],"Ingrese su contrasena");
                             break;
                         default:
                             cantenters=0;
@@ -229,10 +269,10 @@ int main()
                     switch(cantenters)
                     {
                         case 0:
-                            strcpy(encabezado,"Ingrese su modalidad de juego");
+                            strcpy(encabezado[0],"Ingrese su modalidad de juego");
                             break;
                         case 1:
-                            strcpy(encabezado,"Ingrese cantidad de jugadores por equipo");
+                            strcpy(encabezado[0],"Ingrese cantidad de jugadores por equipo");
                             break;
                         default:
                             cantenters=0;
@@ -246,7 +286,7 @@ int main()
                     switch(cantenters)
                     {
                         case 0:
-                            strcpy(encabezado,"Proximamente");
+                            strcpy(encabezado[0],"Proximamente");
                             break;
                         default:
                             cantenters=0;
@@ -259,7 +299,10 @@ int main()
                 default:
                     break;
             }
-            textout_centre_ex(buffer,font,encabezado,ANCHO/2,ALTO/4,makecol(238,187,136),makecol(0,0,0));
+            for(i=0,y=ALTO/8;myStrncmp(encabezado[i],"NULL",my_strlen(encabezado[i]));i++,y+=text_height(font))
+            {
+                textout_centre_ex(buffer,font,encabezado[i],ANCHO/2,y,makecol(238,187,136),makecol(0,0,0));
+            }
             textout_centre_ex(buffer,font,palabra,ANCHO/2,3*ALTO/4,makecol(238,187,136),makecol(0,0,0));
             if(keypressed())
             {
@@ -273,14 +316,49 @@ int main()
             {
                 if(my_strlen(palabra)==0)
                 {
-                    if(opcion!=NO)
+                    if(opcion==REG)
+                    {
+                        switch(cantenters)
+                        {
+                            case 0:
+                                strcpy(palabra,chartostr);
+                                break;
+                            case 1:
+                            case 2:
+                                strcpy(palabra,"*");
+                                strcpy(buffpass,chartostr);
+                                break;
+                            default:
+                                break;
+                        }
+                    }
+                    else if(opcion!=NO)
                     {
                         strcpy(palabra,chartostr);
                     }
                 }
                 else
                 {
-                    strcat(palabra,chartostr);
+                    if(opcion==REG)
+                    {
+                        switch(cantenters)
+                        {
+                            case 0:
+                                strcat(palabra,chartostr);
+                                break;
+                            case 1:
+                            case 2:
+                                strcat(palabra,"*");
+                                strcat(buffpass,chartostr);
+                                break;
+                            default:
+                                break;
+                        }
+                    }
+                    else if(opcion!=NO)
+                    {
+                        strcat(palabra,chartostr);
+                    }
                 }
             }
             else if(chartostr[0]=='\b' && my_strlen(palabra))
@@ -293,10 +371,29 @@ int main()
                 {
                     palabra[0]='\0';
                 }
+                if(my_strlen(buffpass)-1)
+                {
+                    myStrncpy(buffpass,buffpass,my_strlen(buffpass)-1);
+                }
+                else
+                {
+                    palabra[0]='\0';
+                }
             }
             else if(chartostr[0]=='\r')
             {
-                cantenters++;
+                if(my_strlen(palabra))
+                {
+                    cantenters++;
+                }
+                if(opcion==REG && cantenters==1)
+                {
+                    strcpy(us.user,palabra);
+                }
+                else if(opcion==REG && cantenters==2)
+                {
+                    strcpy(us.password,buffpass);
+                }
                 palabra[0]='\0';
             }
             masked_blit(cursor, buffer, 0, 0, mouse_x, mouse_y, 13,22);
@@ -381,4 +478,33 @@ int myStrncpy (char* dest,char* origen,int n)
       *(dest+i)=*(origen+i);
   *(dest+i)=NULLCHAR;
   return 0;
+}
+
+/**
+******************************************************
+*  \fn int myStrncmp (const char*s1,const char*s2,int n)
+*  \brief Función que recibe dos palabras y compara los primeos n caracteres
+* \author Federico Ariel Marinzalda
+* \version 1.0
+* \date 28/6/2016
+* \param [in] *s1 Palabra a comparar
+* \param [in] *s2 Palabra a comparar
+* \param [in] n Cantidad de caracteres a comparar (en caso que sea mayor a la longitud de la palabra s1, se compara esa cantidad de caracteres en vez de n)
+* \returns Diferencia de códigos ASCII de el primer caracter distinto entre s1 y s2, o la diferencia entre los ASCII del último caracter a comparar de cada uno como número entero
+* \details Resulatados posibles
+* \n >0 --> s1 está antes de s2 en el alfabeto
+* \n ==0 --> s1 y s2 están en el mismo orden alfabético
+* \n <0 --> s2 está antes de s1 en el alfabeto
+*******************************************************/
+int myStrncmp (const char* s1,const char* s2,int n)
+{
+  int i;
+  for (i=0;i<n-1 && *(s1+i)!=NULLCHAR;i++)
+  {
+    if (*(s1+i)!=*(s2+i))
+    {
+      return (int)(*(s2+i)-*(s1+i)); //Si el caracter i de la palabra s1 es distinta al de la palabra s2 devuelve la diferencia de sus códigos ASCII como int
+    }
+  }
+  return (int)(*(s2+i)-*(s1+i)); //Si estoy en esta línea, devuelvo la diferencia entre el último caracter a comparar de s1 y el último caracter a comparar de s2
 }
