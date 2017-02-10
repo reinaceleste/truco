@@ -1,5 +1,5 @@
 /**
- *	\file prototips.h
+ *	\file prototipos.h
  *	\brief Contiene los prototipos de las funciones, las constantes simbólicas, typedefs y estructuras utilizadas en la interfaz gráfica
 * \author Federico Ariel Marinzalda
 * \version 1.0
