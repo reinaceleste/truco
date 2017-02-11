@@ -28,8 +28,8 @@
 * \details Se crea una ventana a partir de imagenes bmp
 * \n En terminal, compilar con gcc -o clientui codigograf.c -Wall `allegro-config --libs`
 * \author Federico Ariel Marinzalda
-* \version 2.3
-* \date 10/2/2017
+* \version 3.0
+* \date 11/2/2017
 *
 *******************************************************/
 
@@ -38,7 +38,7 @@ int main()
     BITMAP *portada,*portadaregis,*portadainic,*portadajugar,*portadalideres,*portadasalir,*portadavolver1,*portadavolver2;
     BITMAP *buffer,*cursor;
     FONT *font;
-    char salir=NO,opcion=NO,chartostr[2]={0},palabra[MAX_LONG]={0},limpiobuf=NO,encabezado[MAX_RENG][MAX_REP],errorpass=NO,buffpass[MAX_LONG]={0};
+    char salir=NO,opcion=NO,chartostr[2]={0},palabra[MAX_LONG]={0},limpiobuf=NO,encabezado[MAX_RENG][MAX_REP],errorpass=NO,buffpass[MAX_LONG]={0},modook,cantjugok,conflor,jugstr[2]={0};
     //char buffuser[MAX_LONG];
     int i,y;
     //int tecla;
@@ -231,7 +231,10 @@ int main()
                                 errorpass=NO;
                                 if(keypressed())
                                 {
-                                    cantenters++;
+                                    if(key[KEY_ENTER])
+                                    {
+                                        cantenters++;
+                                    }
                                 }
                             }
                             else
@@ -253,9 +256,11 @@ int main()
                     {
                         case 0:
                             strcpy(encabezado[0],"Ingrese su nombre de usuario");
+                            strcpy(encabezado[1],"Luego presione enter");
                             break;
                         case 1:
                             strcpy(encabezado[0],"Ingrese su contrasena");
+                            strcpy(encabezado[1],"Luego presione enter");
                             break;
                         default:
                             cantenters=0;
@@ -269,10 +274,53 @@ int main()
                     switch(cantenters)
                     {
                         case 0:
-                            strcpy(encabezado[0],"Ingrese su modalidad de juego");
+                            strcpy(encabezado[0],"Ingrese su modo de juego (en mayuscula)");
+                            strcpy(encabezado[1],"S: jugar con flor");
+                            strcpy(encabezado[2],"N: jugar sin flor");
+                            strcpy(encabezado[3],"Luego presione enter");
                             break;
                         case 1:
-                            strcpy(encabezado[0],"Ingrese cantidad de jugadores por equipo");
+                            if(modook==SI)
+                            {
+                                strcpy(encabezado[0],"Ingrese cantidad de jugadores por equipo");
+                                strcpy(encabezado[1],"(de 1 a 3 jugadores por equipo)");
+                                strcpy(encabezado[2],"Luego presione enter");
+                            }
+                            else
+                            {
+                                cantenters=0;
+                            }
+                            break;
+                        case 2:
+                            if(cantjugok==SI)
+                            {
+                                strcpy(encabezado[0],"Log");
+                                strcpy(encabezado[1],"Modo: ");
+                                if(conflor==SI)
+                                {
+                                    strcat(encabezado[1],"con flor");
+                                }
+                                else
+                                {
+                                    strcat(encabezado[1],"sin flor");
+                                }
+                                strcpy(encabezado[2],"Jugadores por equipo: ");
+                                strcat(encabezado[2],jugstr);
+                                strcpy(encabezado[3],"Espere conexion de otros jugadores");
+                                strcpy(encabezado[4],"o bien oprima enter o haga clic en volver");
+                                strcpy(encabezado[5],"para salir del log y volver al menu inicial");
+                                if(keypressed())
+                                {
+                                    if(key[KEY_ENTER])
+                                    {
+                                        cantenters++;
+                                    }
+                                }
+                            }
+                            else
+                            {
+                                cantenters=1;
+                            }
                             break;
                         default:
                             cantenters=0;
@@ -299,7 +347,7 @@ int main()
                 default:
                     break;
             }
-            for(i=0,y=ALTO/8;myStrncmp(encabezado[i],"NULL",my_strlen(encabezado[i]));i++,y+=text_height(font))
+            for(i=0,y=ALTO/8;myStrncmp(encabezado[i],"NULL",my_strlen(encabezado[i])) && i<MAX_RENG;i++,y+=text_height(font))
             {
                 textout_centre_ex(buffer,font,encabezado[i],ANCHO/2,y,makecol(238,187,136),makecol(0,0,0));
             }
@@ -332,6 +380,13 @@ int main()
                                 break;
                         }
                     }
+                    else if(opcion==JUG)
+                    {
+                        if(cantenters<2)
+                        {
+                            strcpy(palabra,chartostr);
+                        }
+                    }
                     else if(opcion!=NO)
                     {
                         strcpy(palabra,chartostr);
@@ -353,6 +408,13 @@ int main()
                                 break;
                             default:
                                 break;
+                        }
+                    }
+                    else if(opcion==JUG)
+                    {
+                        if(cantenters<2)
+                        {
+                            strcat(palabra,chartostr);
                         }
                     }
                     else if(opcion!=NO)
@@ -393,6 +455,37 @@ int main()
                 else if(opcion==REG && cantenters==2)
                 {
                     strcpy(us.password,buffpass);
+                }
+                else if(opcion==JUG && cantenters==1)
+                {
+                    if(myStrncmp(palabra,"S",2) && myStrncmp(palabra,"N",2))
+                    {
+                        modook=NO;
+                    }
+                    else
+                    {
+                        modook=SI;
+                        if(palabra[0]=='S')
+                        {
+                            conflor=SI;
+                        }
+                        else
+                        {
+                            conflor=NO;
+                        }
+                    }
+                }
+                else if(opcion==JUG && cantenters==2)
+                {
+                    if(myStrncmp(palabra,"1",2) && myStrncmp(palabra,"2",2) && myStrncmp(palabra,"3",2))
+                    {
+                        cantjugok=NO;
+                    }
+                    else
+                    {
+                        cantjugok=SI;
+                        strcpy(jugstr,palabra);
+                    }
                 }
                 palabra[0]='\0';
             }
