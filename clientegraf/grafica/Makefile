@@ -7,7 +7,7 @@ LDFLAGS=`allegro-config --libs`
 ARCHIVO=clientui
 PARTE=interfaz gráfica del cliente
 LOGFILE=$(LOGPATH)$(shell date +'%d/%m')
-MODIF=. Submenú de Jugar (log) finalizado.
+MODIF=. Submenú de Líderes finalizado.
 HEADERS=*.h
 OBJS=codigograf.o
 

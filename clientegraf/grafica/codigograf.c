@@ -10,7 +10,7 @@
 * - Borrar web con make no_html
 * - Agregar archivos .c, Makefile y Doxyfile al repositorio con make git
 * \author Federico Ariel Marinzalda
-* \version 1.4
+* \version 1.5
 * \date 10/2/2017
 *
 *
@@ -18,8 +18,17 @@
 
 #include<allegro.h>
 #include"prototipos.h"
-#include<stdio.h>
 #include<string.h>
+
+/**
+******************************************************
+*  \var salir
+*  \brief Variable tipo char que sire como flag para poder cerrar la ventana cuando se lo requiera
+* \details Debe ser global ya que se la utiliza en un handler trapeado por set_close_button_callback
+* \n set_close_button_callback es un puntero a una función que recibe y devuelve void declarado al utilizar allegro
+*
+*******************************************************/
+char salir=NO;
 
 /**
 ******************************************************
@@ -28,7 +37,7 @@
 * \details Se crea una ventana a partir de imagenes bmp
 * \n En terminal, compilar con gcc -o clientui codigograf.c -Wall `allegro-config --libs`
 * \author Federico Ariel Marinzalda
-* \version 3.0
+* \version 4.0
 * \date 11/2/2017
 *
 *******************************************************/
@@ -38,10 +47,10 @@ int main()
     BITMAP *portada,*portadaregis,*portadainic,*portadajugar,*portadalideres,*portadasalir,*portadavolver1,*portadavolver2;
     BITMAP *buffer,*cursor;
     FONT *font;
-    char salir=NO,opcion=NO,chartostr[2]={0},palabra[MAX_LONG]={0},limpiobuf=NO,encabezado[MAX_RENG][MAX_REP],errorpass=NO,buffpass[MAX_LONG]={0},modook,cantjugok,conflor,jugstr[2]={0};
-    //char buffuser[MAX_LONG];
+    char opcion=NO,chartostr[2]={0},palabra[MAX_LONG]={0},limpiobuf=NO,encabezado[MAX_RENG+1][MAX_REP],errorpass=NO,buffpass[MAX_LONG]={0},modook,cantjugok,conflor,jugstr[2]={0};
+    char *usuariosprueba[]={USUARIOSPRUEBA},*passprueba[]={PASSPRUEBA},*lideresprueba[]={LIDERESPRUEBA};
+    char nomok,passok,encontrous;
     int i,y;
-    //int tecla;
     int cantenters;
     struct usuario us;
     if(allegro_init())
@@ -106,6 +115,9 @@ int main()
     {
         abort_on_error("No se cargó la fuente\n");
     }
+    mouse_x=2*ANCHO;
+    mouse_y=2*ALTO;
+    set_close_button_callback(closebuttonhandler);
     while(salir==NO)
     {
         for(i=0;i<MAX_RENG;i++)
@@ -131,6 +143,7 @@ int main()
                     if(mouse_b & 1)
                     {
                         opcion=INIC;
+                        nomok=SI;
                     }
                 }
                 else if(mouse_y_jugar)
@@ -164,9 +177,12 @@ int main()
             }
             masked_blit(cursor, buffer, 0, 0, mouse_x, mouse_y, 13,22);
             blit(buffer, screen, 0, 0, 0, 0, ANCHO, ALTO);
-            if(key[KEY_ESC])
+            if(keypressed())
             {
-                salir=SI;
+                if(key[KEY_ESC])
+                {
+                    salir=SI;
+                }
             }
         }
         else
@@ -255,12 +271,51 @@ int main()
                     switch(cantenters)
                     {
                         case 0:
-                            strcpy(encabezado[0],"Ingrese su nombre de usuario");
-                            strcpy(encabezado[1],"Luego presione enter");
+                            i=0;
+                            if(nomok==NO)
+                            {
+                                strcpy(encabezado[i++],"Nombre de usuario no existe");
+                            }
+                            strcpy(encabezado[i++],"Ingrese su nombre de usuario");
+                            strcpy(encabezado[i++],"Luego presione enter");
+                            passok=SI;
                             break;
                         case 1:
-                            strcpy(encabezado[0],"Ingrese su contrasena");
-                            strcpy(encabezado[1],"Luego presione enter");
+                            if(nomok==SI)
+                            {
+                                i=0;
+                                if(passok==NO)
+                                {
+                                    strcpy(encabezado[i++],"Contrasena incorrecta");
+                                }
+                                strcpy(encabezado[i],"Usuario: ");
+                                strcat(encabezado[i++],us.user);
+                                strcpy(encabezado[i++],"Ingrese su contrasena");
+                                strcpy(encabezado[i++],"Luego presione enter");
+                            }
+                            else
+                            {
+                                cantenters=0;
+                            }
+                            break;
+                        case 2:
+                            if(passok==SI)
+                            {
+                                strcpy(encabezado[0],us.user);
+                                strcat(encabezado[0]," inicio sesion");
+                                strcpy(encabezado[1],"Presione enter o haga clic en volver");
+                                if(keypressed())
+                                {
+                                    if(key[KEY_ENTER])
+                                    {
+                                        cantenters++;
+                                    }
+                                }
+                            }
+                            else
+                            {
+                                cantenters=1;
+                            }
                             break;
                         default:
                             cantenters=0;
@@ -307,11 +362,11 @@ int main()
                                 strcpy(encabezado[2],"Jugadores por equipo: ");
                                 strcat(encabezado[2],jugstr);
                                 strcpy(encabezado[3],"Espere conexion de otros jugadores");
-                                strcpy(encabezado[4],"o bien oprima enter o haga clic en volver");
+                                strcpy(encabezado[4],"o bien oprima ESC o haga clic en volver");
                                 strcpy(encabezado[5],"para salir del log y volver al menu inicial");
                                 if(keypressed())
                                 {
-                                    if(key[KEY_ENTER])
+                                    if(key[KEY_ESC])
                                     {
                                         cantenters++;
                                     }
@@ -334,7 +389,17 @@ int main()
                     switch(cantenters)
                     {
                         case 0:
-                            strcpy(encabezado[0],"Proximamente");
+                            for(i=0;lideresprueba[i] && i<MAX_RENG;i++)
+                            {
+                                strcpy(encabezado[i],lideresprueba[i]);
+                            }
+                            if(keypressed())
+                            {
+                                if(key[KEY_ENTER] || key[KEY_ESC])
+                                {
+                                    cantenters++;
+                                }
+                            }
                             break;
                         default:
                             cantenters=0;
@@ -347,9 +412,19 @@ int main()
                 default:
                     break;
             }
-            for(i=0,y=ALTO/8;myStrncmp(encabezado[i],"NULL",my_strlen(encabezado[i])) && i<MAX_RENG;i++,y+=text_height(font))
+            if(opcion==LID)
             {
-                textout_centre_ex(buffer,font,encabezado[i],ANCHO/2,y,makecol(238,187,136),makecol(0,0,0));
+                for(i=0,y=ALTO/8;myStrncmp(encabezado[i],"NULL",my_strlen(encabezado[i])) && i<MAX_RENG;i++,y+=text_height(font))
+                {
+                    textout_justify_ex(buffer, font, encabezado[i], ANCHO/4, 3*ANCHO/4,y, ANCHO/2, makecol(238,187,136),makecol(0,0,0));
+                }
+            }
+            else
+            {
+                for(i=0,y=ALTO/8;myStrncmp(encabezado[i],"NULL",my_strlen(encabezado[i])) && i<MAX_RENG;i++,y+=text_height(font))
+                {
+                    textout_centre_ex(buffer,font,encabezado[i],ANCHO/2,y,makecol(238,187,136),makecol(0,0,0));
+                }
             }
             textout_centre_ex(buffer,font,palabra,ANCHO/2,3*ALTO/4,makecol(238,187,136),makecol(0,0,0));
             if(keypressed())
@@ -387,9 +462,20 @@ int main()
                             strcpy(palabra,chartostr);
                         }
                     }
-                    else if(opcion!=NO)
+                    else if(opcion==INIC)
                     {
-                        strcpy(palabra,chartostr);
+                        switch(cantenters)
+                        {
+                            case 0:
+                                strcpy(palabra,chartostr);
+                                break;
+                            case 1:
+                                strcpy(palabra,"*");
+                                strcpy(buffpass,chartostr);
+                                break;
+                            default:
+                                break;
+                        }
                     }
                 }
                 else
@@ -417,9 +503,20 @@ int main()
                             strcat(palabra,chartostr);
                         }
                     }
-                    else if(opcion!=NO)
+                    else if(opcion==INIC)
                     {
-                        strcat(palabra,chartostr);
+                        switch(cantenters)
+                        {
+                            case 0:
+                                strcat(palabra,chartostr);
+                                break;
+                            case 1:
+                                strcat(palabra,"*");
+                                strcat(buffpass,chartostr);
+                                break;
+                            default:
+                                break;
+                        }
                     }
                 }
             }
@@ -479,12 +576,40 @@ int main()
                 {
                     if(myStrncmp(palabra,"1",2) && myStrncmp(palabra,"2",2) && myStrncmp(palabra,"3",2))
                     {
-                        cantjugok=NO;
+                        if(my_strlen(palabra))
+                        {
+                            cantjugok=NO;
+                        }
                     }
                     else
                     {
                         cantjugok=SI;
                         strcpy(jugstr,palabra);
+                    }
+                }
+                else if(opcion==INIC && cantenters==1)
+                {
+                    for(nomok=NO,i=0;nomok==NO && usuariosprueba[i];i++)
+                    {
+                        if(myStrncmp(usuariosprueba[i],palabra,my_strlen(usuariosprueba[i])+1)==0)
+                        {
+                            strcpy(us.user,usuariosprueba[i]);
+                            nomok=SI;
+                        }
+                    }
+                }
+                else if(opcion==INIC && cantenters==2)
+                {
+                    for(passok=NO,i=0,encontrous=NO;encontrous==NO && usuariosprueba[i];i++)
+                    {
+                        if(myStrncmp(usuariosprueba[i],us.user,my_strlen(usuariosprueba[i])+1)==0)
+                        {
+                            encontrous=SI;
+                            if(myStrncmp(passprueba[i],buffpass,my_strlen(passprueba[i])+1)==0)
+                            {
+                                passok=SI;
+                            }
+                        }
                     }
                 }
                 palabra[0]='\0';
@@ -513,7 +638,6 @@ END_OF_MAIN();
 ******************************************************
 *  \fn void abort_on_error(const char *message)
 *  \brief Función utilizada para mostrar un mensaje de error y abortar el programa
-* \details Se crea una ventana a partir de imagenes bmp
 * \author Federico Ariel Marinzalda
 * \version 1.0
 * \date 7/2/2017
@@ -529,6 +653,21 @@ void abort_on_error(const char *message)
                          message, allegro_error);
          exit(-1);
       }
+
+/**
+******************************************************
+*  \fn void closebuttonhandler()
+*  \brief Handler para permitir cerrar ventana presionando el botón cerrar (x)
+* \details Se crea una ventana a partir de imagenes bmp
+* \author Federico Ariel Marinzalda
+* \version 1.0
+* \date 11/2/2017
+*
+*******************************************************/
+void closebuttonhandler()
+{
+    salir=SI;
+}
 
 /**
 ******************************************************

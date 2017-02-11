@@ -2,8 +2,8 @@
  *	\file prototipos.h
  *	\brief Contiene los prototipos de las funciones, las constantes simbólicas, typedefs y estructuras utilizadas en la interfaz gráfica
 * \author Federico Ariel Marinzalda
-* \version 1.0
-* \date 7/2/2017
+* \version 1.4
+* \date 11/2/2017
  */
 
 #define ANCHO 640
@@ -27,7 +27,7 @@
 #define NULLCHAR '\0'
 #define MAX_LONG 46
 #define MAX_REP 1000
-#define MAX_RENG 6
+#define MAX_RENG 11
 #define MAX_USER 40
 #define MAX_PASS 24
 #define mouse_en_opciones mouse_x>=470&&((mouse_y>=190&&mouse_y<=230)||(mouse_y>=250&&mouse_y<=290)||(mouse_y>=310&&mouse_y<=350)||(mouse_y>=360&&mouse_y<=400)||(mouse_y>=410&&mouse_y<=450))
@@ -37,6 +37,9 @@
 #define mouse_y_lideres mouse_y>=360&&mouse_y<=400
 #define mouse_y_salir mouse_y>=410&&mouse_y<=450
 #define mouse_en_volver mouse_x>=480&&mouse_x<=550&&mouse_y>=410&&mouse_y<=450
+#define USUARIOSPRUEBA "federico","reina","marcelo","florencia","sebastian",NULL
+#define PASSPRUEBA "abCD1234","info1Elec","R1022prof","cursoR1022","elec1022R",NULL
+#define LIDERESPRUEBA "Usuario puntos","marcelo 155","reina 120","federico 105","florencia 100","sebastian 100","a 90","b 85","c 85","d 75","e 70","f 65","g 60"
 
 /**
  *	\struct usuario
@@ -55,3 +58,4 @@ void abort_on_error(const char *message);
 int my_strlen (char* palabra);
 int myStrncpy (char* dest,char* origen,int n);
 int myStrncmp (const char* s1,const char* s2,int n);
+void closebuttonhandler(void);
